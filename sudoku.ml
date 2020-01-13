@@ -1,0 +1,27 @@
+open Printf
+open Graphics
+open String
+open Array
+
+let path = "/mnt/d/Documents/GitHub/Sudoku/grids/grid0.txt"
+
+let initGrille str =
+	let mat = make_matrix 9 9 0 in
+	for i=0 to 9 do 
+		for j=0 to 9 do 
+			mat.(i).(j) <- get str.(j);
+		done
+	done;
+	mat
+;;
+
+let ()=
+	let file = open_in path in
+	try
+		let line = input_line file in
+		print_endline line;
+	  close_in file
+	
+	with e ->                      (* some unexpected exception occurs *)
+	  close_in_noerr file;           (* emergency closing *)
+	  raise e
