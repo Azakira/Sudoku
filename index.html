@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>
+Projet PFA
+</title>
+<style>
+tt {
+        color:blue;
+}
+pre {
+        color:blue;
+}
+</style>
+</head>
+
+<body>
+
+<div align = "center"><strong><font size="15">Projet de programmation</font></strong></div>
+
+<h1> Sudoku </h1>
+Deux projets sont proposés cette année sur le thème du jeu Sudoku. 
+	<ul>
+		<li> <b><a href="#project1">Projet 1</a></b> : programmer un jeu graphique interactif</li>
+		<li> <b><a href="#project2">Projet 2</a></b> : résoudre le problème du Sudoku avec un solveur SAT </li>
+	</ul>
+<h2>Modalités </h2>
+	<ul>
+		<li> les deux projets sont à faire en monôme ou en binôme et en OCaml </li>
+		<li> vous devrez envoyer pour
+		le <strong><font color="red">4 mai 2020</font></strong> (avant minuit) une archive (<tt>nom.tgz</tt> ou <tt>nom1_nom2.tgz</tt>) à <tt>alexandrina.korneva@u-psud.fr</tt> contenant:
+			<ul>
+			<li> le code final de votre projet (uniquement les fichiers <tt>.ml</tt> et <tt>.mli</tt> et un <tt>Makefile</tt> dans le cas du Projet 1)</li>
+			<li> un rapport de 2-3 pages max (au format <tt>.pdf</tt>, <tt>.odt</tt>, <tt>.doc</tt>
+  ou <tt>.docx</tt>) décrivant votre projet (les fonctionnalités, le déroulement du développement, votre organisation, les problèmes rencontrés, les solutions proposées etc.)</li>
+		  </ul>
+		</li>
+</ul>
+			<b>Soutenance</b> : une soutenance aura lieu
+			le <strong><font color="red">11 mai 2020</font></strong>. Vous devrez faire une demo de votre programme et repondre aux questions éventuelles sur le développement du projet. 
+	
+
+
+<h2>Présentation Générale</h2><a name="project1"></a>
+
+
+Tout le monde connait le jeu du Sudoku. Dans sa version la plus
+classique, le jeu se présente sous la forme d'une grille de 9x9,
+divisée en 9 sous-grilles de 3x3 appelées régions. Initialement, la
+grille contient quelques chiffres et le but du jeu est de remplir
+chaque case vide avec des chiffres de 1 à 9 de manière à ce que chaque
+ligne, chaque colonne et chaque région ne contienne qu'une instance de
+chaque chiffre.
+
+<p/>
+<div align="center"><img src="sudoku1.png" alt="Sudoku"></div>
+
+	<h2><span id="project1">Projet 1 : Jeu Interactif</span></h2>
+<p> Le but de ce projet est de programmer un Sudoku interactif. </p>
+<p>Vous trouverez quelques exemples des jeux de Sudoku pour vous inspirer sur les sites suivants: </p>
+	<ul>
+		<li><a href="https://sudoku.com/">Sudoku 1</a></li>
+		<li><a href="https://www.soduko-online.com/">Sudoku 2</a></li>
+		<li><a href="https://www.websudoku.com/">Sudoku 3</a></li>
+		<li><a href="https://sudoku.game/">Sudoku 4</a></li>
+		
+	</ul>
+
+	Le projet doit inclure les fonctionnalités de base. Pour améliorer votre note, vous pouvez implémenter une ou plusieurs fonctionnalités supplémentaires. Vous pouvez organiser votre code de la manière que vous voulez, cependant vous devrez avoir au moins deux modules (le module <tt>Ig</tt> fourni ne compte pas), par exemple un module pour charger la grille et un module pour le jeu. Vous n’êtes pas obligés d’utiliser la bibliothèque <tt>Graphics</tt> tant que vous maîtrisez ce que vous utilisez.   
+	<p>On vous fournit un <a href="ig.ml">fichier</a> <tt>ig.ml</tt> pour lire / charger des images <tt>.ppm</tt>. Pour l'utiliser dans votre programmer il suffit de faire 
+		<tt>draw_image (Ig.init_image "img.ppm") 0 0</tt> </p>
+	<p>On vous fournit des <a href="grids.zip">grilles de Sudoku</a> et leurs <a href="solutions.zip">solutions</a>. 
+		Chaque fichier contient une ligne de 81 caractères qui correspondent aux valeurs des cases. 
+		Chaque grille <tt>grid[numero].txt</tt> correspond à sa solution <tt>solution[numero].txt</tt> (ex. <tt>grid0.txt</tt> et <tt>solution0.txt</tt>)</p>
+	Les premiers 9 caractères correspondent à la première ligne de la grille, les 9 suivants à la deuxième ligne etc.
+
+<p/>
+Par exemple, la ligne du fichier
+
+<pre>
+790304108000006000000080059030000497000000000217000030470010000000700000302609071
+</pre>
+
+<p/>
+correspond à a grille de Sudoku:
+
+<pre>
+-------------
+|790|304|108|
+|000|006|000|
+|000|080|059|
+-------------
+|030|000|497|
+|000|000|000|
+|217|000|030|
+-------------
+|470|010|000|
+|000|700|000|
+|302|609|071|
+-------------
+</pre>
+	
+Vous devez coder votre jeu en utilisant les notions vues en cours de programmation fonctionelle (listes, fonctions récursives, itérateurs, . . .). Vous pouvez utiliser la programmation impérative (tableaux, références, ...) tant que vous l’expliquez dans le rapport. 
+	
+<h3>Fonctionnalités de base</h3>
+	On vous demande d'avoir les fonctionnalités suivantes :
+	<ul>
+		<li> il faut charger une grille de Sudoku et l'afficher comme dans l'image en haut
+			<ul>
+				<li>Cette grille doit être chargée à
+				partir d'un fichier</li>
+			</ul>
+		</li>
+		<li> un joueur doit pouvoir cliquer sur une case de la grille et la remplir avec un chiffre entre 1 et 9
+		<ul><li> on ne doit pas pouvoir cliquer et modifier une case préremplie </li></ul>
+		</li>
+		<li>le jeu doit vérifier si les réponses sont correctes ou pas. Vous êtes libres dans le choix de vérifier la grille en entière ou vérifier case par case.  </li>
+		<li>dès que la grille est complète, le jeu doit indiquer si vous avez gagné ou perdu  </li>
+		<li>le joueur doit être capable de revenir en arrière et effacer le(s) dernier(s) chiffre(s) ajouté(s) </li>
+		<li> le joueur doit pouvoir demander de l'aide au jeu pour résoudre la grille </li>
+		<li> on doit pouvoir enregistrer et charger une partie</li>
+		<li> on doit avoir une bouton qui affiche la liste des commandes et les règles du Sudoku </li>
+	
+	</ul>
+	
+	<h3>Fonctionnalités supplémentaires</h3>
+	<ul>
+		<li> backtracking : stocker chaque décision dans une pile. Si vous voulez annuler une décision et effacer le chiffre, votre jeu doit effacer tous les decisions qui ont été faites après la decision à effacer </li>
+		<li> ajouter des niveaux de difficulté</li>
+		<li> menu: avoir un menu pour
+			<ul>
+				<li> démarrer le jeu / charger une partie</li>
+				<li> choisir le niveau de difficulté </li>
+				<li> choisir une grille (avec un aperçu de chaque grille)</li>
+			</ul>
+		</li>
+		<li> ajouter un timer pour le jeu
+			<ul>
+				<li> possibilité de faire pause pour arrêter le timer
+				<ul> <li>masquer la grille si le timer est arrêté</li></ul>
+				</li>
+				<li> calculer un score pour chaque grille en fonction du temps
+				<ul><li>garder le score pour pouvoir essayer de le battre</li></ul>
+				</li>
+			</ul>
+		</li>
+		<li> surligner la case sélectionnée </li>
+		<li> améliorer l'affichage (ajouter un fond, etc)</li>
+		<li> redémarrer une partie</li>
+		<li> augmenter les fonctionnalités de l'aide au joueur
+			<ul>
+				<li> donner plusieurs possibilités pour chaque case</li>
+				<li> limiter le nombre de fois qu'un joueur peut demander de l'aide</li>
+				<li> cliquer sur un chiffre surligne ce chiffre partout dans la grille </li>
+			</ul>
+		</li>
+		<li> un jeu complet : le jeu est composé de plusieurs niveaux, s'enchaînant les uns avec les autres. Il y a une logique de jeu (score pour chaque niveau etc) </li>
+	
+	</ul>
+	Vous êtes libres de rajouter d'autres fonctionnalités dans votre jeu tant que vous les expliquez dans le rapport.   
+	
+	
+	
+	<h2><span id="project2">Projet 2: Résoudre le problème du Sudoku avec un solveur SAT</span></h2>
+	Le but de ce projet est de résoudre des grilles de Sudoku en utilisant un solveur SAT. 
+<h3>Comment résoudre une grille de Sudoku</h3>
+
+Il y a plus de 60000000000000000000000 grilles de Sudoku! Il est donc
+impossible de les énumérer avec un ordinateur pour espérer résoudre le
+puzzle du Sudoku.
+
+<p/>
+
+Une manière de résoudre une grille consiste à encoder le problème
+comme une formule de la logique propositionnelle de sorte que le
+puzzle a une solution si et seulement si la formule est satisfiable.
+
+<p/>
+
+Dans ce projet, on va utiliser dans un premier temps le solveur
+SAT <tt>minisat</tt> pour déterminer si une formule est
+satisfiable. Ensuite, dans un deuxième temps, on réalisera notre
+propre solveur SAT.
+
+<h3>Décodage des grilles de Sudoku</h3>
+
+Afin de tester vos algorithmes, nous vous fournissons un fichier
+contenant des <a href="puzzles.sdk">grilles de Sudoku</a>. Chaque
+ligne du fichier correspond à une grille de Sudoku. Les grilles sont
+simplement codées à l'aide de 81 caractères qui correspondent aux
+valeurs initiales des cases. Les premiers 9 caractères correspondent à 
+la première ligne de la grille, les 9 suivants à la deuxième ligne etc.
+
+<p/>
+Par exemple, la ligne du fichier
+
+<pre>
+790304108000006000000080059030000497000000000217000030470010000000700000302609071
+</pre>
+
+<p/>
+correspond à a grille de Sudoku:
+
+<pre>
+-------------
+|790|304|108|
+|000|006|000|
+|000|080|059|
+-------------
+|030|000|497|
+|000|000|000|
+|217|000|030|
+-------------
+|470|010|000|
+|000|700|000|
+|302|609|071|
+-------------
+</pre>
+
+<b>Travail à réaliser.</b>
+<p/>
+1. Écrire un programme OCaml pour lire le contenu de ce fichier et
+stocker chaque grille dans une matrice d'entiers. 
+<p/>
+2. Écrire également un programme pour afficher les grilles (vous pouvez
+vous inspirer de l'affichage ci-dessus).
+
+<h3>Encodage du Sudoku vers une formule propositionnelle</h3>
+
+Le problème du Sudoku peut même être simplement encodé par une formule de
+la logique propositionnelle. 
+
+<p/>
+
+<b>Travail à réaliser</b> <p/>
+3. Lire l'article de Tjark
+Weber <a href="A_SAT-based_Sudoku_solver.pdf">A SAT-based Sudoku
+  Solver</a> pour construire, pour chaque grille de Sudoku,
+une formule propositionnelle en FNC équivalente à la grille.
+
+<p/>
+Vous pourrez par exemple utiliser les types OCaml suivants pour
+représenter les atomes, les clauses et les
+formules en FNC : 
+<pre>
+  type cellule = { i : int; j : int }
+  type atome = { cellule : cellule; d : int; signe : bool }
+  type clause = atome list
+  type fnc = clause list
+</pre>
+
+<h3>Utilisation du solveur <tt>MiniSat</tt></h3>
+
+Le solveur SAT <a href="http://minisat.se/MiniSat.html">MiniSat</a>
+prend en entrée un fichier contenant une formule en FNC. Cette formule
+est décrite dans un format très simple appelé <em>Dimacs</em>.
+
+<p/>
+Voici un exemple très simple d'une formule en CNF dans ce format.
+<pre>
+c
+c start with comments
+c
+c 
+p cnf 5 3
+1 -5 4 0
+-1 5 3 4 0
+-3 -4 0
+</pre>
+
+Les lignes qui commencent pas un <tt>c</tt> sont des commentaires
+(vous pouvez donc les ignorer). La ligne <tt>p cnf 5 3</tt> indique
+que le fichier contient une formule en CNF avec au plus 5 variables et
+3 clauses. Chaque ligne suivante décrit une clause. Ainsi, la
+ligne <tt>1 -5 4 0</tt> représente la clause <tt>x1 ou (non x5) ou
+  x4</tt>, le caractère <tt>0</tt> indique simplement la fin de la ligne.
+
+<p/>
+L'utilisation de <tt>minisat</tt> est très simple. Pour savoir si la
+formule en CNF contenu dans un fichier <tt>grille.dimacs</tt> est
+satisfiable, il suffit d'exécuter la commande 
+
+<pre>minisat grille.dimacs</pre>
+
+Si la formule est satisfiable, <tt>minisat</tt> affichera
+simplement <tt>SATISFIABLE</tt> à l'écran.
+<p/>
+Ce solveur peut également renvoyer la valeur des variables
+propositionnelles qui satisfont la formules en entrée. Pour cela, il
+suffit d'appeler <tt>minisat</tt> de la manière suivante:
+
+<pre>minisat grille.dimacs fichier_solution</pre>
+
+où <tt>fichier_solution</tt> est le nom d'un fichier de sortie dans
+lequel <tt>minisat</tt> va écrire la solution. Le format de ce fichier
+de sortie est le suivant
+
+<pre>
+SAT
+-1 -2 -3 -4 -5 0
+</pre>
+La première ligne contient uniquement <tt>SAT</tt> pour indiquer que
+la formule est satisfiable. La ligne suivante contient la valeur des
+variables propositionnelles (séparées par un caractère espace).
+
+
+<p/>
+<b>Travail à réaliser</b>
+<p/>
+4. Traduire chaque formule propositionnelle représentant une grille de
+Sudoku dans un fichier au format Dimacs
+<p/>
+5. À l'aide de la fonction de la bibliothèque standard <tt>Sys.command
+: string -&gt int</tt>, appeler <tt>minisat</tt> pour trouver une
+solution aux fichiers Dimacs générés, et extraire les solutions des
+grilles de Sudoku à partir des modèles renvoyés par le solveur.
+<p/>
+6. Vérifier que la solution renvoyée pour le solveur SAT est correcte
+<p/>
+7. Afficher les solutions des grilles. (vous pouvez simplement
+utiliser la même fonction que pour afficher les grilles initiales)
+
+<h3>Programmation d'un solveur SAT</h3>
+
+
+En vous inspirant de
+  l'<a href="https://www.lri.fr/~paulin/Logique/feuille5.pdf">exercice
+  9 du TD6-7-8 de logique</a>, réaliser votre propre SAT solver plutôt
+que d'utiliser <tt>minisat</tt>.
+
+	<p> 
+<b>Travail à réaliser</b></p>
+<p>8. Implémenter votre SAt solver pour resoudre les grilles de Sudoku.</p>
+</body>
+</html>
