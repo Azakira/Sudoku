@@ -3,8 +3,8 @@ open Printf
 open String
 open Array
 
-let path = "/mnt/c/Users/nizef/Documents/THIERRY/WorkSpace/L3INFO/Sudoku/grids/grid0.txt"
-
+(* let path = "/mnt/c/Users/nizef/Documents/THIERRY/WorkSpace/L3INFO/Sudoku/grids/grid0.txt" *)
+let path = "/Users/ishnuts/Documents/GitHub/Sudoku/grids/grid0.txt"
 let initGrille str =
 	let mat = make_matrix 9 9 0 in
 	for i=0 to 9 do 
@@ -24,18 +24,6 @@ let affiche_matrix mat =
         done
 ;;*)
                         
-let ()=
-	let file = open_in path in
-	try
-		let line = input_line file in
-		print_endline line;
-	  close_in file
-	
-	with e ->                      (* some unexpected exception occurs *)
-	  close_in_noerr file;           (* emergency closing *)
-	  raise e
-;;
-
 let file_to_string path =
         let file = open_in path in
         try 
@@ -47,6 +35,8 @@ let file_to_string path =
                 raise e
 ;;
 
-print_endline " affiche du resulat de file_to_string";;
-print_string (file_to_string path) ;;
+let file_string = file_to_string path;;
+print_endline " affiche du resulat de file_to_string ";;
+print_endline (file_string) ;;
 
+ 
