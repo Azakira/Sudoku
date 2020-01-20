@@ -1,7 +1,8 @@
 open Printf
-(*open Graphics*)
+open Graphics
 open String
 open Array
+
 
 let path = "/mnt/d/Documents/Github/Sudoku/grids/grid0.txt"
 (*let path = "/mnt/c/Users/nizef/Documents/THIERRY/WorkSpace/L3INFO/Sudoku/grids/grid0.txt"*)
@@ -46,5 +47,4 @@ let file_string = file_to_string path;;
 print_endline " affiche du resulat de file_to_string ";;
 let g = initGrille file_string;;
 affiche_grille g;;
-
- 
+let () = open_graph "200x400";;
