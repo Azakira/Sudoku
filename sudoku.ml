@@ -15,7 +15,15 @@ let initGrille str =
 	done;
 	mat
 ;;
-               
+(*
+let affiche_matrix mat =
+        for i=0 to mat.length do
+                for j=0 to mat.length do
+                        print_int mat.(i).(j);
+                done
+        done
+;;*)
+                        
 let file_to_string path =
         let file = open_in path in
         try 
