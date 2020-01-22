@@ -4,8 +4,8 @@ open String
 open Array
 
 
-let path = "/mnt/d/Documents/Github/Sudoku/grids/grid0.txt"
-(*let path = "/mnt/c/Users/nizef/Documents/THIERRY/WorkSpace/L3INFO/Sudoku/grids/grid0.txt"*)
+(*let path = "/mnt/d/Documents/Github/Sudoku/grids/grid0.txt"*)
+let path = "/home/tochange/Documents/L3INFO/ocaml/Sudoku/grids/grid0.txt"
 (* let path = "/Users/ishnuts/Documents/GitHub/Sudoku/grids/grid0.txt" *)
 let initGrille str =
 	let mat = make_matrix 9 9 '0' in
@@ -18,7 +18,7 @@ let initGrille str =
 	done;
 	mat
 
-
+;;
 let affiche_grille mat =
 	for i=0 to 8 do
 	 begin
@@ -31,7 +31,7 @@ let affiche_grille mat =
 	 end
 	done
 
-
+;;
 let file_to_string path =
         let file = open_in path in
         try 
@@ -42,9 +42,31 @@ let file_to_string path =
                 close_in_noerr file;
                 raise e
 
-
+;;
 let file_string = file_to_string path;;
 print_endline " affiche du resulat de file_to_string ";;
 let g = initGrille file_string;;
 affiche_grille g;;
-let () = open_graph "200x400";;
+let  rec loop () = 
+        loop()
+;;
+
+let affiche_sudoku  width height  =
+        for i=0 to height-90 do
+               for j =0 to width-90 do
+                       if j mod 90 = 0 then
+                               if i mod 90 = 0 then 
+                               draw_rect i j (width/9)  (height/9);
+                                
+               done;
+        done;
+
+;;
+let () = 
+        open_graph " 810x810";
+        set_window_title " sudoku ";
+        affiche_sudoku 810 810;
+        sound 10 10 ;
+        loop ()
+;;
+
