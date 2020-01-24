@@ -51,21 +51,37 @@ let  rec loop () =
         loop()
 ;;
 
-let affiche_sudoku  width height  =
+let draw_sudoku  width height  =
         for i=0 to height-90 do
                for j =0 to width-90 do
                        if j mod 90 = 0 then
                                if i mod 90 = 0 then 
-                               draw_rect i j (width/9)  (height/9);
-                                
+                               	    draw_rect i j (width/9)  (height/9);
                done;
         done;
 
 ;;
+
+
+let stroke_that_bitch width height =	
+
+	for i=0 to height do
+	     for j=0 to width do
+		if j mod 270 =0 then 
+			if i mod 270 = 0 then	   		
+				draw_rect i j (3*width/9) (3*height/9);
+				set_line_width 3;
+	     done;
+	done;
+	draw_rect 0 0 width  height;
+;;
+		 
+	
 let () = 
-        open_graph " 810x810";
+        open_graph " 811x811";
         set_window_title " sudoku ";
-        affiche_sudoku 810 810;
+        draw_sudoku 810 810;
+	stroke_that_bitch 810 810;
         sound 10 10 ;
         loop ()
 ;;
