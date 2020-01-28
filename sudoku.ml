@@ -7,7 +7,11 @@ open Array
 (*let path = "/mnt/d/Documents/Github/Sudoku/grids/grid0.txt"*)
 let path = "/home/tochange/Documents/L3INFO/ocaml/Sudoku/grids/grid0.txt"
 let pathS ="/home/tochange/Documents/L3INFO/ocaml/Sudoku/solutions/solution0.txt" 
+
+(*PATH TONY*)
+(*let pathS ="/Users/ishnuts/Documents/GitHub/Sudoku/solutions/solution0.txt"*)
 (* let path = "/Users/ishnuts/Documents/GitHub/Sudoku/grids/grid0.txt" *)
+
 let initGrille str =
 	let mat = make_matrix 9 9 '0' in
 	for i=0 to 8 do
@@ -87,18 +91,19 @@ let removeValueOfMatrix x y mat =
         mat
 ;;
 
-let comp arg1 arg2 =
-        let rec compare l1 l2 = 
-                match l1 with
-                [] ->true
-                |h::t-> if h!= List.hd l2 return false compare t (List.tl l2)
-        in compare arg1 arg2
+
+
+
+let rec compare l1 l2 = 
+        match l1 with
+        |[] -> true
+        |h::t-> if h!= List.hd l2 then false else compare t (List.tl l2)
 ;;
 
 let verifGrille matRep matSol = 
         let listRep = to_list matRep in
         let listSol = to_list matSol in
-        compare listRep listSol
+        if(compare listSol listRep== true) then print_endline "c bon" else print_endline " c pas bon"
 ;;
 
 (* MAIN*)
