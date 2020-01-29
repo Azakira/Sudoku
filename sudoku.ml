@@ -73,14 +73,6 @@ let stroke_that_bitch width height =
 	draw_rect 0 0 width  height;
 ;;
 
-let caseCorrect x y grid soln = 
-        if grid.(x).(y)==soln.(x).(y) then
-               (* print_endline "you got this "*)
-                true 
-        else 
-                (*print_endline "tony is that you ? "*)
-                false
-;;
 
 let insertValueInMatrix x y valeur mat = 
         mat.(x).(y) <- valeur;
@@ -91,39 +83,57 @@ let removeValueOfMatrix x y mat =
         mat
 ;;
 
+let verifieLigne i matRep =
+        (*given an array  of 9 zeros *)
+        let hashArray = Array.make 9 0 in 
+        (* consider every value in mapRep.(i) as our array's index and do +1 at that index 
+         * the number at that index of our array correspond to the occurence of that index as a value
+         * in the mapRep.(i) *)
+        for j = 0 to 8 do
+                let pos = (int_of_char (matRep.(i).(j)) -1)  in
+                hashArray.( pos )  <-  hashArray.(pos) + 1
+        done;
+        (*transform array to list *)
+        let arrayToList = to_list hashArray in
+        (* check if every number occurs only once *)
+        let rec verifyList l = 
+                match l with
+                []-> true
+                |h::t -> if h=0 then verifyList t else h=0 
+        in
+        verifyList arrayToList
 
 
-
-let rec compare l1 l2 = 
-        match l1 with
-        |[] -> true
-        |h::t-> if h!= List.hd l2 then false else compare t (List.tl l2)
 ;;
+ 
+               
 
-let verifGrille matRep matSol = 
-        let listRep = to_list matRep in
-        let listSol = to_list matSol in
-        if(compare listSol listRep== true) then print_endline "c bon" else print_endline " c pas bon"
-;;
 
-(* MAIN*)
+(* MAIN *)
+
 let file_string = file_to_string path;;
 print_endline " affiche du resulat de file_to_string ";;
 let grilleReponse= initGrille file_string;;
 
-let file_stringSolution = file_to_string pathS;;
-let grilleSolution = initGrille file_stringSolution;;
-
 grilleReponse = insertValueInMatrix 0 0 '8' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 2 '5' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 3 '9' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 4 '1' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 5 '7' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 6 '2' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 7 '4' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 8 '6' grilleReponse;;
 
-caseCorrect 0 0 grilleReponse grilleSolution;;
 affiche_grille grilleReponse;;
 
-removeValueOfMatrix 0 0 grilleReponse;;
-print_endline " apres suppression de la valuer";
+print_endline " verification de ligne 0 ...";;
+
+if verifieLigne 0 grilleReponse then print_endline "the line is ok ! " else print_endline " tony is that you ?";;
+
 affiche_grille grilleReponse;;
 
-verifGrille grilleReponse grilleSolution;;
+(*
 let  rec loop () = 
         loop()
 ;;
@@ -135,4 +145,4 @@ let () =
         sound 10 10 ;
         loop ()
 ;;
-
+*)
