@@ -8,13 +8,13 @@ open Array
 
 
 (*PATH*)
-(*let path = "/home/tochange/Documents/L3INFO/ocaml/Sudoku/grids/grid0.txt"*)
+let path = "/mnt/c/Users/student/Documents/THIERRY/WorkSpace/L3INFO/Sudoku/grids/grid0.txt"
 (*let pathS ="/home/tochange/Documents/L3INFO/ocaml/Sudoku/solutions/solution0.txt"*)
 
 (*PATH TONY*)
 (*let pathS ="/Users/ishnuts/Documents/GitHub/Sudoku/solutions/solution0.txt"*)
 (* let path = "/Users/ishnuts/Documents/GitHub/Sudoku/grids/grid0.txt" *)
-let path = "/home/tp-home007/tabemon/L3/S6/PFA/Sudoku-master/grids/grid0.txt"
+(*let path = "/home/tp-home007/tabemon/L3/S6/PFA/Sudoku-master/grids/grid0.txt"*)
 
 let initGrille str =
         let mat = make_matrix 9 9 ('0',true) in
@@ -31,15 +31,23 @@ let initGrille str =
 ;;
 let affiche_grille mat =
 	for i=0 to 8 do
-	 begin
 		for j=0 to 8 do
-			if mat.(i).(j)='0' then print_string "." else print_char mat.(i).(j);
-			if j=2 || j=5 || j=8 then print_string "|" else	print_string " ";
+                        begin
+                        if (fst (mat.(i).(j))  = '0') then 
+                                print_string "."
+                        else 
+                                print_char (fst (mat.(i).(j)));
+	                        if j=2 || j=5 || j=8 then 
+                                        print_string "|"
+                                else	
+                                        print_string " ";
+                       end;
 		done;
 		print_string "\n";
 		if i=2 || i=5 || i=8 then print_string "─────────────────\n";
-	 end
-	done
+        done;
+        if (snd (mat.(0).(0)) ) then print_string "ok"
+        else print_string "not ok";
 
 ;;
 let file_to_string path =
@@ -86,7 +94,7 @@ let removeValueOfMatrix x y mat =
 let  rec loop () = 
         loop()
 ;;
-let () = 
+(*let () = 
         open_graph " 811x811";
         set_window_title " sudoku ";
         draw_sudoku 810 810;
@@ -94,7 +102,7 @@ let () =
         sound 10 10 ;
         loop ()
 ;;
-
+*)
  
                
 
@@ -105,15 +113,9 @@ let file_string = file_to_string path;;
 print_endline " affiche du resulat de file_to_string ";;
 let grilleReponse= initGrille file_string;;
 
-grilleReponse = insertValueInMatrix 0 0 '8' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 2 '5' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 3 '9' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 4 '1' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 5 '7' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 6 '2' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 7 '4' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 8 '6' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 0 ('8',true) grilleReponse;;
+grilleReponse = insertValueInMatrix 0 1 ('3',true) grilleReponse;;
+grilleReponse = insertValueInMatrix 0 2 ('5',true) grilleReponse;;
 
 affiche_grille grilleReponse;;
 
