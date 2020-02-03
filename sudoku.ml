@@ -13,13 +13,14 @@ let pathS ="/home/tochange/Documents/L3INFO/ocaml/Sudoku/solutions/solution0.txt
 (* let path = "/Users/ishnuts/Documents/GitHub/Sudoku/grids/grid0.txt" *)
 
 let initGrille str =
-	let mat = make_matrix 9 9 '0' in
+        let mat = make_matrix 9 9 ('0',true) in
 	for i=0 to 8 do
-		begin
 			for j=0 to 8 do
-				mat.(i).(j) <- str.[i*9+j]
-			done;
-		end
+                                if (str.[i*9+j] <> '0') then
+                                        mat.(i).(j)<- (str.[i*9+j],false)
+                                else
+                                        mat.(i).(j) <- (str.[i*9+j],true)
+                        done
 	done;
 	mat
 
@@ -146,3 +147,4 @@ let () =
         loop ()
 ;;
 *)
+
