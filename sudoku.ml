@@ -130,7 +130,10 @@ let draw_sudoku_value sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
                  moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
-                 Graphics.draw_char (fst (sudoku_values.(j).(i)));
+                
+                        if ( (fst (sudoku_values.(j).(i))) != '0') then 
+                            Graphics.draw_char (fst (sudoku_values.(j).(i)));
+              
                done;
         done;
 ;;
