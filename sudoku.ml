@@ -130,7 +130,6 @@ let draw_sudoku_value sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
                  moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
-                
                         if ( (fst (sudoku_values.(j).(i))) != '0') then 
                             Graphics.draw_char (fst (sudoku_values.(j).(i)));
               
@@ -215,7 +214,7 @@ let file_stringR = file_to_string pathReponse;;
 let file_stringS = file_to_string pathSolution;;
 
 (*make grille of grid*)
-let grilleReponse= initGrille file_stringR;;
+let grilleReponse = initGrille file_stringR;;
 
 (*make grille of solution*)
 let grilleSolution = initGrille file_stringS;;
@@ -238,6 +237,19 @@ let  rec loop () =
         loop()
 ;;
 
+
+(*
+let f = 
+  let e = Graphics.wait_next_event [Graphics.Key_pressed] in
+  if e.keypressed then begin
+    let key = e.key in
+    if( (int_of_char key)>=(int_of_char '1') && (int_of_char key)<=(int_of_char '9')) then
+      grilleReponse = insertValueInMatrix 1 2 key grilleReponse;
+      (* grilleReponse = insertValueInMatrix 0 2  key  grilleReponse;*)
+      ();
+  end; 
+ ;;
+*)
 (*unit
   function calls int that unit are done on the execution of this file
   @param none 
@@ -247,17 +259,12 @@ let () =
         open_graph " 811x811";
         set_window_title " sudoku ";
         draw_sudoku width height;
-        stroke 810 810;
+                stroke 810 810;
         draw_sudoku_value grilleReponse 810 810;
         sound 10 10 ;
-        print_int (Graphics.current_x());
         loop ()
 
 ;;
-
-
-
-
 
 (******************end of file*******************)
 
