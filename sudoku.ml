@@ -119,19 +119,18 @@ let draw_sudoku  width height  =
         done;
 ;;
 
-(*procedure  draw_sudoku_default_value 
-  given a string of 91 charactors, move cursor in center of a cell, grab the right char
-  (right position in the string ) then draw_char 
+(*procedure  draw_sudoku_value 
+  given a matrix of couples (char,bool), draw its characters to screen 
   !!! ocaml graph uses mathematical represenation of graphs: i or x is from left to light 
       and j from bottom to top  !!!
-  @param sudoku_values : string
+  @param sudoku_values : matrix of couples (char,bool)
   @return none
 *)
-let draw_sudoku_default_value sudoku_values height width=
+let draw_sudoku_value sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
                  moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
-                 Graphics.draw_char sudoku_values.[j*9+i]; 
+                 Graphics.draw_char (fst (sudoku_values.(j).(i)));
                done;
         done;
 ;;
@@ -218,11 +217,10 @@ let grilleReponse= initGrille file_stringR;;
 (*make grille of solution*)
 let grilleSolution = initGrille file_stringS;;
 
-(*
+
 grilleReponse = insertValueInMatrix 0 0 '8' grilleReponse;;
 grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
 grilleReponse = insertValueInMatrix 0 2 '5' grilleReponse;;
-*)
 affiche_grille grilleReponse;;
 
 verifGrille grilleSolution grilleSolution;;
@@ -247,7 +245,7 @@ let () =
         set_window_title " sudoku ";
         draw_sudoku width height;
         stroke 810 810;
-        draw_sudoku_default_value file_stringR 810 810;
+        draw_sudoku_value grilleReponse 810 810;
         sound 10 10 ;
         print_int (Graphics.current_x());
         loop ()
