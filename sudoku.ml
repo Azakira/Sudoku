@@ -3,6 +3,10 @@ open Graphics
 open String
 open Array
 
+
+
+
+(************* file paths ******************)
 (*PATH ZAK*)
 (*let path = "/mnt/d/Documents/Github/Sudoku/grids/grid0.txt"*)
 
@@ -16,6 +20,20 @@ let pathSolution = "/home/tochange/Documents/thierry/workSpace/psud/l3Info/s6/pf
 (*let pathS ="/Users/ishnuts/Documents/GitHub/Sudoku/solutions/solution0.txt"*)
 (* let path = "/Users/ishnuts/Documents/GitHub/Sudoku/grids/grid0.txt" *)
 (*let path = "/home/tp-home007/tabemon/L3/S6/PFA/Sudoku-master/grids/grid0.txt"*)
+
+(************** end of file paths section *******)
+
+
+
+(******** global variables **********************)
+let cellSize = 90
+let height = 810
+let width = 810
+
+
+(********* end of global variables **************)
+
+
 
 
 (*function initGrille
@@ -87,16 +105,33 @@ let file_to_string path =
 
 
 (*procedure draw_sudoku
-  given a height and a width, considering considering a nested loop where i are horizental lines ans j
-  vertical lines, i and j varying from 0 to (height|width/90)-1=8 as  we  choose height and width  to get 9*9 cellulors
-  and we draw lines every 90 pixel  (i*90)(j*90)
+  given a height and a width, considering a nested loop where i are horizental lines ans j
+  vertical lines, i and j varying from 0 to (height|width/cellSize)-1=8 as  we  choose height and width  to get 9*9 cells
+  and we draw lines every cellSize pixel  (i*cellSize)(j*cellSize)
   @param a width, a height
   @return none
 *)
 let draw_sudoku  width height  =
-        for i=0 to (height/90)-1 do
-               for j =0 to (width/90)-1 do
-                    draw_rect (i*90) (j*90) (width*10)  (height*10); (*cuz 90/9=10*)
+        for i=0 to (height/cellSize)-1 do
+               for j =0 to (width/cellSize)-1 do
+                 draw_rect (i*cellSize) (j*cellSize) (width*10)  (height*10); (*cuz cellSize/9=10*)
+               done;
+        done;
+;;
+
+(*procedure  draw_sudoku_default_value 
+  given a string of 91 charactors, move cursor in center of a cell, grab the right char
+  (right position in the string ) then draw_char 
+  !!! ocaml graph uses mathematical represenation of graphs: i or x is from left to light 
+      and j from bottom to top  !!!
+  @param sudoku_values : string
+  @return none
+*)
+let draw_sudoku_default_value sudoku_values height width=
+        for i=0 to (height/cellSize)-1 do
+               for j =0 to (width/cellSize)-1 do
+                 moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
+                 Graphics.draw_char sudoku_values.[j*9+i]; 
                done;
         done;
 ;;
@@ -166,17 +201,32 @@ let verifGrille matRep matSol =
         if(compare listSol listRep== true) then print_endline "c bon" else print_endline " c pas bon"
 ;;
 
-(*procedure  afficheMousPos
-  given a position, print its coordinate separatly 
-  @param a position : couple (x,y)
-  @return none
+ 
+               
+
+
+(* MAIN *)
+
+(* import grid*)
+let file_stringR = file_to_string pathReponse;;
+(* import solution*)
+let file_stringS = file_to_string pathSolution;;
+
+(*make grille of grid*)
+let grilleReponse= initGrille file_stringR;;
+
+(*make grille of solution*)
+let grilleSolution = initGrille file_stringS;;
+
+(*
+grilleReponse = insertValueInMatrix 0 0 '8' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
+grilleReponse = insertValueInMatrix 0 2 '5' grilleReponse;;
 *)
-let afficheMousPos pos =
-  print_string "\n x : " ;
-  print_int (fst pos);
-  print_string " \n y: ;";
-  print_int (snd pos); 
-;;
+affiche_grille grilleReponse;;
+
+verifGrille grilleSolution grilleSolution;;
+
 
 (*function loop
   calls its self
@@ -195,39 +245,32 @@ let  rec loop () =
 let () = 
         open_graph " 811x811";
         set_window_title " sudoku ";
-        draw_sudoku 810 810;
-	stroke 810 810;
+        draw_sudoku width height;
+        stroke 810 810;
+        draw_sudoku_default_value file_stringR 810 810;
         sound 10 10 ;
         print_int (Graphics.current_x());
         loop ()
 
 ;;
 
- 
-               
 
 
-(* MAIN *)
-
-(* import grid*)
-let file_stringR = file_to_string pathReponse;;
-(* import solution*)
-let file_stringS = file_to_string pathSolution;;
-
-(*make grille of grid*)
-let grilleReponse= initGrille file_stringR;;
-
-(*make grille of solution*)
-let grilleSolution = initGrille file_stringS;;
 
 
-grilleReponse = insertValueInMatrix 0 0 '8' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 2 '5' grilleReponse;;
+(******************end of file*******************)
 
-affiche_grille grilleReponse;;
 
-verifGrille grilleSolution grilleSolution;;
+
+
+
+
+
+
+
+
+
+
 
 
 (*
