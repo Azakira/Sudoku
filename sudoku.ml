@@ -5,7 +5,6 @@ open Array
 
 
 
-
 (************* file paths ******************)
 (*PATH ZAK*)
 (*let path = "/mnt/d/Documents/Github/Sudoku/grids/grid0.txt"*)
@@ -26,14 +25,25 @@ let pathSolution = "/home/tochange/Documents/thierry/workSpace/psud/l3Info/s6/pf
 
 
 (******** global variables **********************)
+
+(* every cell has 90*90 pixels. this number depends on hight and width of the sudoku*)
 let cellSize = 90
+
+(*the height of the whole sudoku windows bottom =0 to top =810*)
 let height = 810
+
+(*the width of the whole sudoku windows left=0 to right=810*)
 let width = 810
+
+(* all different values that a cordinate in sudoku can have*)
+let positionList = [0;90;180;270;360;450;540;630;720;810];;
+
+(*data structure to represent sudoku position *)
+type sudoku_position = {mutable abs:int; mutable ord:int};;
+
 
 
 (********* end of global variables **************)
-
-
 
 
 (*function initGrille
@@ -130,12 +140,14 @@ let draw_sudoku_value sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
                  moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
-                        if ( (fst (sudoku_values.(j).(i))) != '0') then 
+                 if ( (fst (sudoku_values.(j).(i))) != '0') then
                             Graphics.draw_char (fst (sudoku_values.(j).(i)));
               
                done;
         done;
 ;;
+
+
 
 (*function stroke 
   given a width and height will chossen as we want 9*9 grid
@@ -163,7 +175,6 @@ let stroke width height =
 *)
 let insertValueInMatrix x y valeur mat = 
         mat.(x).(y) <- (valeur,true);
-        mat
 ;;
 
 (*function removeValueOfMatrix 
@@ -202,10 +213,48 @@ let verifGrille matRep matSol =
         if(compare listSol listRep== true) then print_endline "c bon" else print_endline " c pas bon"
 ;;
 
- 
                
+(*function sudoku_position 
+  given a position given a couple of (x,y) in bounds of our sudoku and
+  a list of possible positions, it choose the right position and returns
+  a centered coordinate of the sudoku cell
+  @param a couple :(int,int)
+  @return a couple :(int,int)
+*)
+let get_sudoku_position pos_couple positionList = 
+  let (x,y) = pos_couple in
+    let rec matchPos l sudok_pos = 
+     match l with
+     | [] -> sudok_pos
+     | possiPos::restofPos -> if ((sudok_pos.abs) = (-1)) then 
+                                  if (possiPos>x) then
+                                    sudok_pos.abs <- ((possiPos-90)+(cellSize/2));
+                              if ((sudok_pos.ord) = (-1)) then
+                                  if(possiPos>y) then 
+                                    sudok_pos.ord <- (( possiPos-90)+(cellSize/2));
+                              matchPos restofPos sudok_pos
+    in matchPos positionList {abs = -1; ord = -1}
+;;
 
-
+(*procedure read_key_and_draw
+  listen for numerical keys and draw them in sudoku cell
+  under the mouse
+  @param none 
+  @return none
+*)
+let read_key_and_draw ()= 
+  while true do
+    let e = Graphics.wait_next_event [Graphics.Key_pressed] in
+    if e.Graphics.keypressed then 
+      let key = e.Graphics.key in
+      if( (int_of_char key)>=(int_of_char '1') && (int_of_char key)<=(int_of_char '9')) then begin
+        let mousePos = (e.mouse_x,e.mouse_y) in
+        let sP = get_sudoku_position mousePos positionList in
+        Graphics.moveto (sP.abs) (sP.ord); 
+        Graphics.draw_char e.key
+      end
+  done;
+;;
 (* MAIN *)
 
 (* import grid*)
@@ -220,9 +269,9 @@ let grilleReponse = initGrille file_stringR;;
 let grilleSolution = initGrille file_stringS;;
 
 
-grilleReponse = insertValueInMatrix 0 0 '8' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
-grilleReponse = insertValueInMatrix 0 2 '5' grilleReponse;;
+insertValueInMatrix 0 0 '8' grilleReponse;
+insertValueInMatrix 0 1 '3' grilleReponse;
+insertValueInMatrix 0 2 '5' grilleReponse;
 affiche_grille grilleReponse;;
 
 verifGrille grilleSolution grilleSolution;;
@@ -238,32 +287,21 @@ let  rec loop () =
 ;;
 
 
-(*
-let f = 
-  let e = Graphics.wait_next_event [Graphics.Key_pressed] in
-  if e.keypressed then begin
-    let key = e.key in
-    if( (int_of_char key)>=(int_of_char '1') && (int_of_char key)<=(int_of_char '9')) then
-      grilleReponse = insertValueInMatrix 1 2 key grilleReponse;
-      (* grilleReponse = insertValueInMatrix 0 2  key  grilleReponse;*)
-      ();
-  end; 
- ;;
-*)
 (*unit
-  function calls int that unit are done on the execution of this file
+  functions call at  the execution of this file
   @param none 
   @return none
 *)
+
 let () = 
-        open_graph " 811x811";
+        open_graph " 810x810";
         set_window_title " sudoku ";
         draw_sudoku width height;
-                stroke 810 810;
-        draw_sudoku_value grilleReponse 810 810;
+        stroke 810 810;
+        draw_sudoku_value grilleReponse width height;
+        read_key_and_draw();
         sound 10 10 ;
         loop ()
-
 ;;
 
 (******************end of file*******************)
