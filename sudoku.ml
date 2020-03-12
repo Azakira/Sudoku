@@ -174,24 +174,25 @@ let stroke width height =
   @return a matrix of couples (integer as a char, bool)
 *)
 let insertValueInMatrix x y valeur mat = 
-        mat.(x).(y) <- (valeur,true);
+      mat.(x).(y) <- (valeur,true);
+      mat
 ;;
 
 (*function removeValueOfMatrix 
-  given a x, a y and a matrix of couples (integer as a char, bool)
+  given x, y and a matrix of couples (integer as a char, bool)
   put the value at (x,y) of the matrix to '0'(zero as a char)
   @param x, y integers and a matrix of couples (integer as a char, bool)
   @return matrix of couples (integer as a char, bool)
 *)
 let removeValueOfMatrix x y mat = 
-        mat.(x).(y) <- '0';
+        mat.(x).(y) <- ('0',true);
         mat
 ;;
 
 (*bool compare
   given 2 lists, this function compare one element of one list to one element of other list 
   that are at the same position 
-  @param l1 ,l2: Lists
+@param l1 ,l2: Lists
   @return bool
 *)
 let rec compare l1 l2 = 
@@ -213,6 +214,22 @@ let verifGrille matRep matSol =
         if(compare listSol listRep== true) then print_endline "c bon" else print_endline " c pas bon"
 ;;
 
+
+(*function insert_value_into_sudoku
+  this fct insert a value into the cell at SudokuPosition of coupleMat if 
+  the cell is modifiable and return true, just return false otherwise
+  @param  a coupleMat, a value : 1<=int<=9 and a sudokuPosition
+  @return bool
+*)
+
+(*comment recuperer l'element retourner par une fonction ?*)
+let insert_value_into_sudoku coupleMat value sudokuPos  =
+  if (snd coupleMat.(sudokuPos.abs).(sudokuPos.ord)) then
+    insertValueInMatrix sudokuPos.abs sudokuPos.ord value coupleMat
+  else
+      coupleMat;
+;;
+      
                
 (*function sudoku_position 
   given a position given a couple of (x,y) in bounds of our sudoku and
@@ -221,7 +238,7 @@ let verifGrille matRep matSol =
   @param a couple :(int,int)
   @return a couple :(int,int)
 *)
-let get_sudoku_position pos_couple positionList = 
+let get_sudoku_graph_position pos_couple positionList = 
   let (x,y) = pos_couple in
     let rec matchPos l sudok_pos = 
      match l with
@@ -236,26 +253,50 @@ let get_sudoku_position pos_couple positionList =
     in matchPos positionList {abs = -1; ord = -1}
 ;;
 
+(*function sudoku_position 
+  given a position given a couple of (x,y) in bounds of our sudoku and
+  a list of possible positions, it choose the right position and returns
+  a cordonne of a couple's matrix
+  @param a couple :(int,int)
+  @return a couple :(int,int)
+*)
+
+let get_sudoku_matrice_position pos_couple positionList = 
+  let (x,y) = pos_couple in
+    let rec matchPos l sudok_pos = 
+     match l with
+     | [] -> sudok_pos
+     | possiPos::restofPos -> if ((sudok_pos.abs) = (-1)) then 
+                                  if (possiPos>y) then
+                                    sudok_pos.abs <- (((width/cellSize)-1)-(possiPos-90)/90);
+                              if ((sudok_pos.ord) = (-1)) then
+                                  if(possiPos>x) then 
+                                    sudok_pos.ord <- (( possiPos-90)/90);
+                              matchPos restofPos sudok_pos
+    in matchPos positionList {abs = -1; ord = -1}
+;;
+
 (*procedure read_key_and_draw
   listen for numerical keys and draw them in sudoku cell
   under the mouse
   @param none 
   @return none
 *)
-let read_key_and_draw ()= 
+let read_key_and_draw grilleReponse= 
   while true do
     let e = Graphics.wait_next_event [Graphics.Key_pressed] in
     if e.Graphics.keypressed then 
       let key = e.Graphics.key in
       if( (int_of_char key)>=(int_of_char '1') && (int_of_char key)<=(int_of_char '9')) then begin
         let mousePos = (e.mouse_x,e.mouse_y) in
-        let sP = get_sudoku_position mousePos positionList in
-        Graphics.moveto (sP.abs) (sP.ord); 
-        Graphics.draw_char e.key
-      end
+        let sudokuMatPos = get_sudoku_matrice_position mousePos positionList in
+        let grilleReponse = insert_value_into_sudoku grilleReponse key sudokuMatPos  in
+        Graphics.clear_graph ();
+        draw_sudoku width height;
+        draw_sudoku_value grilleReponse width height
+      end;
   done;
 ;;
-(* MAIN *)
 
 (* import grid*)
 let file_stringR = file_to_string pathReponse;;
@@ -268,14 +309,17 @@ let grilleReponse = initGrille file_stringR;;
 (*make grille of solution*)
 let grilleSolution = initGrille file_stringS;;
 
-
-insertValueInMatrix 0 0 '8' grilleReponse;
-insertValueInMatrix 0 1 '3' grilleReponse;
-insertValueInMatrix 0 2 '5' grilleReponse;
+(*
+let grilleReponse = insertValueInMatrix 4 0 '8' grilleReponse;;
+let grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
+let grilleReponse = insertValueInMatrix 0 3 '5' grilleReponse;;
+*)
+(*
 affiche_grille grilleReponse;;
 
 verifGrille grilleSolution grilleSolution;;
 
+*)
 
 (*function loop
   calls its self
@@ -297,9 +341,9 @@ let () =
         open_graph " 810x810";
         set_window_title " sudoku ";
         draw_sudoku width height;
-        stroke 810 810;
+        (*stroke 810 810;*)
         draw_sudoku_value grilleReponse width height;
-        read_key_and_draw();
+        read_key_and_draw grilleReponse;
         sound 10 10 ;
         loop ()
 ;;
