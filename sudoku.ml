@@ -140,8 +140,17 @@ let draw_sudoku_value sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
                  moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
-                 if ( (fst (sudoku_values.(j).(i))) != '0') then
-                            Graphics.draw_char (fst (sudoku_values.(j).(i)));
+                 if ( (fst (sudoku_values.(j).(i))) != '0') then begin
+                   Graphics.draw_char (fst (sudoku_values.(j).(i)));
+                 if ( (snd (sudoku_values.(j).(i))) = false) then 
+                   let grey = Graphics.rgb 125 125 125 in
+                   Graphics.set_color grey;
+                   Graphics.fill_rect (i*cellSize)  ((((width/cellSize)-1)-j)*cellSize) (cellSize) (cellSize);
+                   Graphics.set_color Graphics.black;
+                   Graphics.draw_rect (i*cellSize)  ((((width/cellSize)-1)-j)*cellSize) (cellSize) (cellSize);
+                   moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
+                   Graphics.draw_char (fst (sudoku_values.(j).(i)));
+                 end 
               
                done;
         done;
@@ -279,16 +288,29 @@ let get_sudoku_matrice_position pos_couple positionList =
 (*procedure read_key_and_draw
   listen for numerical keys and draw them in sudoku cell
   under the mouse
-  @param none 
+  @param grilleReponse 
   @return none
 *)
 let read_key_and_draw grilleReponse= 
+    let toBeModifiedMousePos = {abs= -1 ; ord = -1} in
   while true do
-    let e = Graphics.wait_next_event [Graphics.Key_pressed] in
+    let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down] in
+    if e.Graphics.button then begin
+      Graphics.clear_graph ();
+      draw_sudoku width height;
+      draw_sudoku_value grilleReponse width height;
+      Graphics.set_color Graphics.red;
+      toBeModifiedMousePos.abs <- e.mouse_x;
+      toBeModifiedMousePos.ord <- e.mouse_y;
+      let mousePos = (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) in
+      let sudokuGraphPos = get_sudoku_graph_position mousePos positionList in
+      Graphics.fill_rect (sudokuGraphPos.abs-(cellSize/2))  (sudokuGraphPos.ord-(cellSize/2)) (cellSize) (10);
+      Graphics.set_color Graphics.black
+    end;
     if e.Graphics.keypressed then 
       let key = e.Graphics.key in
       if( (int_of_char key)>=(int_of_char '1') && (int_of_char key)<=(int_of_char '9')) then begin
-        let mousePos = (e.mouse_x,e.mouse_y) in
+        let mousePos = (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) in
         let sudokuMatPos = get_sudoku_matrice_position mousePos positionList in
         let grilleReponse = insert_value_into_sudoku grilleReponse key sudokuMatPos  in
         Graphics.clear_graph ();
