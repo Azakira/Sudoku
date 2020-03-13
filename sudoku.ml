@@ -173,7 +173,8 @@ let stroke width height =
 				set_line_width 3;
 	     done;
 	done;
-	draw_rect 0 0 width  height;
+        draw_rect 0 0 width  height;
+        Graphics.set_line_width 1;
 ;;
 
 (*function insertValueInMatrix 
@@ -363,7 +364,7 @@ let () =
         open_graph " 810x810";
         set_window_title " sudoku ";
         draw_sudoku width height;
-        (*stroke 810 810;*)
+        stroke 810 810;
         draw_sudoku_value grilleReponse width height;
         read_key_and_draw grilleReponse;
         sound 10 10 ;
