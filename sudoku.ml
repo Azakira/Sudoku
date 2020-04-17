@@ -10,8 +10,16 @@ open Array
 (*let path = "/mnt/d/Documents/Github/Sudoku/grids/grid0.txt"*)
 
 (*PATH*)
+(*
 let pathReponse = "/home/tochange/Documents/thierry/workSpace/psud/l3Info/s6/pfa/Sudoku/grids/grid0.txt"
 let pathSolution = "/home/tochange/Documents/thierry/workSpace/psud/l3Info/s6/pfa/Sudoku/solutions/solution0.txt"
+*)
+(* v2 *)
+let pathReponse = "/home/tochange/Documents/l3Info/Sudoku/grids/grid0.txt"
+let pathSolution = "/home/tochange/Documents/l3Info/Sudoku/solutions/solution0.txt"
+
+
+
 (*let pathS ="/home/tochange/Documents/L3INFO/ocaml/Sudoku/solutions/solution0.txt"*)
 
 
