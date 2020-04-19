@@ -191,7 +191,7 @@ let stroke width height =
   @param x, y : integers for the position, and an Interger as char and a matrix of couples (integer as a char, bool)
   @return a matrix of couples (integer as a char, bool)
 *)
-let insertValueInMatrix x y valeur mat = 
+let insertValueInMatrix mat valeur x y= 
       mat.(x).(y) <- (valeur,true);
       mat
 ;;
@@ -207,6 +207,12 @@ let removeValueOfMatrix x y mat =
         mat
 ;;
 
+let matToList mat = 
+    let rec rowToList i res = 
+        if i<0 then res else rowToList (i-1)  (List.append res (to_list mat.(i))) in
+    rowToList ((length mat)-1) []
+;;
+
 (*bool compare
   given 2 lists, this function compare one element of one list to one element of other list 
   that are at the same position 
@@ -216,7 +222,7 @@ let removeValueOfMatrix x y mat =
 let rec compare l1 l2 = 
         match l1 with
         |[] -> true
-        |h::t-> if h!= List.hd l2 then false else compare t (List.tl l2)
+        |h::t-> if (fst h) != fst (List.hd l2) then false else compare t (List.tl l2)
 ;;
 
 (*function verifGrille
@@ -227,16 +233,11 @@ let rec compare l1 l2 =
   @return a string
 *)
 let verifGrille matRep matSol = 
-        let listRep = to_list matRep in
-        let listSol = to_list matSol in
+        let listRep = matToList matRep in
+        let listSol = matToList matSol in
         compare listRep listSol
 ;;
 
-let matToList mat = 
-    let rec rowToList i res = 
-        if i<0 then res else rowToList (i-1)  (List.append res (to_list mat.(i))) in
-    rowToList ((length mat)-1) []
-;;
 
 (*function insert_value_into_sudoku
   this fct insert a value into the cell at SudokuPosition of coupleMat if 
@@ -247,17 +248,26 @@ let matToList mat =
 (*comment recuperer l'element retourner par une fonction ?*)
 let insert_value_into_sudoku coupleMat value sudokuPos  =
   if (snd coupleMat.(sudokuPos.abs).(sudokuPos.ord)) then
-    insertValueInMatrix sudokuPos.abs sudokuPos.ord value coupleMat
+    insertValueInMatrix coupleMat value sudokuPos.abs sudokuPos.ord 
   else
-      coupleMat;
+      coupleMat
 ;;
 let remove_value_from_sudoku coupleMat sudokuPos = 
   if (snd coupleMat.(sudokuPos.abs).(sudokuPos.ord)) then
         removeValueOfMatrix sudokuPos.abs sudokuPos.ord coupleMat
   else
-      coupleMat;
+      coupleMat
 ;;
 
+(*weirdly giving a bool instead of a char as value doesn't trigger error*)
+let insertAVallueOnhelp  grilleSolution grilleReponse  sudokuPos =
+    let value = fst (grilleSolution.(sudokuPos.abs).(sudokuPos.ord)) in
+    if (snd grilleReponse.(sudokuPos.abs).(sudokuPos.ord)) then
+        insertValueInMatrix grilleReponse value sudokuPos.abs sudokuPos.ord 
+     else
+        grilleReponse
+;;
+    
 let checkAllCellsWritten mat = 
     let matAsList = matToList mat in
     let rec checkCell aMatList = 
@@ -320,7 +330,7 @@ let get_sudoku_matrice_position pos_couple positionList =
   @param grilleReponse 
   @return none
 *)
-let read_key_and_draw grilleReponse= 
+let read_key_and_draw grilleSolution grilleReponse= 
     let toBeModifiedMousePos = {abs= -1 ; ord = -1} in
     let grilleComplete = ref true in 
   while  !grilleComplete do
@@ -337,19 +347,28 @@ let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down;Grap
       Graphics.fill_rect (sudokuGraphPos.abs-(cellSize/2))  (sudokuGraphPos.ord-(cellSize/2)) (cellSize) (10);
       Graphics.set_color Graphics.black
     end;
-    if e.Graphics.keypressed then 
+    if e.Graphics.keypressed then
         let key = e.Graphics.key in
         let mousePos = (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) in
         let sudokuMatPos = get_sudoku_matrice_position mousePos positionList in
-      if( (int_of_char key)>=(int_of_char '0') && (int_of_char key)<=(int_of_char '9')) then begin
-        let grilleReponse = (if (int_of_char key)=(int_of_char '0') then
-               remove_value_from_sudoku   grilleReponse sudokuMatPos
-        else
-            insert_value_into_sudoku grilleReponse key sudokuMatPos) in
-        Graphics.clear_graph ();
-        draw_sudoku width height;
-        draw_sudoku_value grilleReponse width height
-     end;
+        let grilleReponse = (if key='h' then
+                insertAVallueOnhelp grilleSolution grilleReponse sudokuMatPos 
+             else
+               grilleReponse) in
+         Graphics.clear_graph ();
+         draw_sudoku width height;
+         draw_sudoku_value grilleReponse width height;
+        if( (int_of_char key)>=(int_of_char '0') && (int_of_char key)<=(int_of_char '9')) then begin
+             let grilleReponse = (if (int_of_char key)=(int_of_char '0') then
+                remove_value_from_sudoku   grilleReponse sudokuMatPos
+             else
+                insert_value_into_sudoku grilleReponse key sudokuMatPos) in
+            Graphics.clear_graph ();
+            draw_sudoku width height;
+            draw_sudoku_value grilleReponse width height
+        end;
+    
+    
     grilleComplete :=  not (checkAllCellsWritten grilleReponse);
     
   done;
@@ -366,9 +385,9 @@ let  rec loop () =
 ;;
 
 
-let draw_victory grilleReponse grilleSolution = 
+let draw_victory grilleSolution grilleReponse = 
     Graphics.clear_graph();
-    if ( verifGrille grilleReponse grilleSolution) then
+    if ( verifGrille grilleSolution grilleReponse) then
         let i = ref 0 in
         while !i<500000 do            
             i := !i+1;
@@ -379,7 +398,7 @@ let draw_victory grilleReponse grilleSolution =
         let i = ref 0 in
         while !i<500000 do            
             i := !i+1;
-            Graphics.moveto 400 400;
+            Graphics.moveto 360 400;
             Graphics.draw_string " D E F E A T  "
         done;
 ;;
@@ -415,14 +434,14 @@ verifGrille grilleSolution grilleSolution;;
   @return none
 *)
 
-let () = 
+let () =
         open_graph " 810x810";
         set_window_title " sudoku ";
         draw_sudoku width height;
         stroke 810 810;
         draw_sudoku_value grilleReponse width height;
-        let grilleReponse = read_key_and_draw grilleReponse in
-        draw_victory grilleReponse grilleSolution;
+        let grilleReponse = read_key_and_draw  grilleSolution grilleReponse in
+        draw_victory grilleSolution grilleReponse;
         sound 10 10 ;
 ;;
 
