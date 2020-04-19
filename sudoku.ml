@@ -78,7 +78,7 @@ let initGrille str =
 
 (*procedure affiche_grille  
   @param a 9*9 matrix of couples (int as a char, bool)
-  @return none
+  @return void
 *)
 let affiche_grille mat =
 	for i=0 to 8 do
@@ -229,9 +229,14 @@ let rec compare l1 l2 =
 let verifGrille matRep matSol = 
         let listRep = to_list matRep in
         let listSol = to_list matSol in
-        if(compare listSol listRep== true) then print_endline "c bon" else print_endline " c pas bon"
+        compare listRep listSol
 ;;
 
+let matToList mat = 
+    let rec rowToList i res = 
+        if i<0 then res else rowToList (i-1)  (List.append res (to_list mat.(i))) in
+    rowToList ((length mat)-1) []
+;;
 
 (*function insert_value_into_sudoku
   this fct insert a value into the cell at SudokuPosition of coupleMat if 
@@ -239,7 +244,6 @@ let verifGrille matRep matSol =
   @param  a coupleMat, a value : 1<=int<=9 and a sudokuPosition
   @return bool
 *)
-
 (*comment recuperer l'element retourner par une fonction ?*)
 let insert_value_into_sudoku coupleMat value sudokuPos  =
   if (snd coupleMat.(sudokuPos.abs).(sudokuPos.ord)) then
@@ -247,8 +251,24 @@ let insert_value_into_sudoku coupleMat value sudokuPos  =
   else
       coupleMat;
 ;;
-      
-               
+let remove_value_from_sudoku coupleMat sudokuPos = 
+  if (snd coupleMat.(sudokuPos.abs).(sudokuPos.ord)) then
+        removeValueOfMatrix sudokuPos.abs sudokuPos.ord coupleMat
+  else
+      coupleMat;
+;;
+
+let checkAllCellsWritten mat = 
+    let matAsList = matToList mat in
+    let rec checkCell aMatList = 
+        match aMatList with
+        | [] -> true
+        |head::tail -> if (fst head) ='0' then false 
+                        else checkCell tail 
+    in checkCell matAsList
+;; 
+
+
 (*function sudoku_position 
   given a position given a couple of (x,y) in bounds of our sudoku and
   a list of possible positions, it choose the right position and returns
@@ -302,8 +322,9 @@ let get_sudoku_matrice_position pos_couple positionList =
 *)
 let read_key_and_draw grilleReponse= 
     let toBeModifiedMousePos = {abs= -1 ; ord = -1} in
-  while true do
-    let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down] in
+    let grilleComplete = ref true in 
+  while  !grilleComplete do
+let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down;Graphics.Mouse_motion] in
     if e.Graphics.button then begin
       Graphics.clear_graph ();
       draw_sudoku width height;
@@ -317,17 +338,52 @@ let read_key_and_draw grilleReponse=
       Graphics.set_color Graphics.black
     end;
     if e.Graphics.keypressed then 
-      let key = e.Graphics.key in
-      if( (int_of_char key)>=(int_of_char '1') && (int_of_char key)<=(int_of_char '9')) then begin
+        let key = e.Graphics.key in
         let mousePos = (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) in
         let sudokuMatPos = get_sudoku_matrice_position mousePos positionList in
-        let grilleReponse = insert_value_into_sudoku grilleReponse key sudokuMatPos  in
+      if( (int_of_char key)>=(int_of_char '0') && (int_of_char key)<=(int_of_char '9')) then begin
+        let grilleReponse = (if (int_of_char key)=(int_of_char '0') then
+               remove_value_from_sudoku   grilleReponse sudokuMatPos
+        else
+            insert_value_into_sudoku grilleReponse key sudokuMatPos) in
         Graphics.clear_graph ();
         draw_sudoku width height;
         draw_sudoku_value grilleReponse width height
-      end;
+     end;
+    grilleComplete :=  not (checkAllCellsWritten grilleReponse);
+    
   done;
+    grilleReponse;
 ;;
+
+(*function loop
+  calls its self
+  @param unit
+  @return none
+*)
+let  rec loop () = 
+        loop()
+;;
+
+
+let draw_victory grilleReponse grilleSolution = 
+    Graphics.clear_graph();
+    if ( verifGrille grilleReponse grilleSolution) then
+        let i = ref 0 in
+        while !i<500000 do            
+            i := !i+1;
+            Graphics.moveto 360 400;
+            Graphics.draw_string " V I C T O I R E ";
+        done;
+    else
+        let i = ref 0 in
+        while !i<500000 do            
+            i := !i+1;
+            Graphics.moveto 400 400;
+            Graphics.draw_string " D E F E A T  "
+        done;
+;;
+
 
 (* import grid*)
 let file_stringR = file_to_string pathReponse;;
@@ -352,16 +408,7 @@ verifGrille grilleSolution grilleSolution;;
 
 *)
 
-(*function loop
-  calls its self
-  @param unit
-  @return none
-*)
-let  rec loop () = 
-        loop()
-;;
-
-
+    
 (*unit
   functions call at  the execution of this file
   @param none 
@@ -374,9 +421,9 @@ let () =
         draw_sudoku width height;
         stroke 810 810;
         draw_sudoku_value grilleReponse width height;
-        read_key_and_draw grilleReponse;
+        let grilleReponse = read_key_and_draw grilleReponse in
+        draw_victory grilleReponse grilleSolution;
         sound 10 10 ;
-        loop ()
 ;;
 
 (******************end of file*******************)
