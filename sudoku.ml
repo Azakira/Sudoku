@@ -6,27 +6,18 @@ open Array
 
 
 (************* file paths ******************)
-(*PATH ZAK*)
-(*let path = "/mnt/d/Documents/Github/Sudoku/grids/grid0.txt"*)
 
-(*PATH*)
-(*
-let pathReponse = "/home/tochange/Documents/thierry/workSpace/psud/l3Info/s6/pfa/Sudoku/grids/grid0.txt"
-let pathSolution = "/home/tochange/Documents/thierry/workSpace/psud/l3Info/s6/pfa/Sudoku/solutions/solution0.txt"
-*)
-(* v2 *)
-let pathReponse = "/home/tochange/Documents/l3Info/Sudoku/grids/grid0.txt"
-let pathSolution = "/home/tochange/Documents/l3Info/Sudoku/solutions/solution0.txt"
+let get_sol_rep_paths lvl = 
+        let dir = Sys.getcwd() in
+        let stringLvl = string_of_int lvl in
+        (dir^"/grids/grid"^stringLvl^".txt",dir^"/solutions/solution"^stringLvl^".txt" )
+;;
 
-
-
-(*let pathS ="/home/tochange/Documents/L3INFO/ocaml/Sudoku/solutions/solution0.txt"*)
-
-
-(*PATH TONY*)
-(*let pathS ="/Users/ishnuts/Documents/GitHub/Sudoku/solutions/solution0.txt"*)
-(* let path = "/Users/ishnuts/Documents/GitHub/Sudoku/grids/grid0.txt" *)
-(*let path = "/home/tp-home007/tabemon/L3/S6/PFA/Sudoku-master/grids/grid0.txt"*)
+let get_save_path lvl =
+        let dir = Sys.getcwd() in
+        let stringLvl = string_of_int lvl in
+        (dir^"/saveSudoku"^stringLvl^".txt",dir^"/solutions/solution"^stringLvl^".txt" )
+;;
 
 (************** end of file paths section *******)
 
@@ -75,6 +66,7 @@ let initGrille str =
 	mat
 
 ;;
+ 
 
 (*procedure affiche_grille  
   @param a 9*9 matrix of couples (int as a char, bool)
@@ -121,7 +113,15 @@ let file_to_string path =
 
 ;;
 
-
+let string_to_file path s = 
+    let file = open_out path in
+    try 
+        output_string file s;
+        close_out file
+with e->
+    close_out_noerr file;
+    raise e
+;;
 (*procedure draw_sudoku
   given a height and a width, considering a nested loop where i are horizental lines ans j
   vertical lines, i and j varying from 0 to (height|width/cellSize)-1=8 as  we  choose height and width  to get 9*9 cells
@@ -196,6 +196,7 @@ let insertValueInMatrix mat valeur x y=
       mat
 ;;
 
+
 (*function removeValueOfMatrix 
   given x, y and a matrix of couples (integer as a char, bool)
   put the value at (x,y) of the matrix to '0'(zero as a char)
@@ -238,7 +239,26 @@ let verifGrille matRep matSol =
         compare listRep listSol
 ;;
 
+let matToString mat = 
+    let resString = ref "" in
+    for i = 0 to (length mat)-1 do
+        for j = 0 to (length mat)-1 do
+            resString := !resString ^ (String.make 1 ( fst mat.(i).(j))) ;
+        done ;
+    done;
+    !resString
+;;
 
+let saveSudoku mat path = 
+    let sudoku = matToString mat in
+    string_to_file path sudoku;
+;;
+
+let loadSudoku path = 
+        let file = file_to_string path in
+        initGrille file
+;;
+    
 (*function insert_value_into_sudoku
   this fct insert a value into the cell at SudokuPosition of coupleMat if 
   the cell is modifiable and return true, just return false otherwise
@@ -402,19 +422,38 @@ let draw_victory grilleSolution grilleReponse =
             Graphics.draw_string " D E F E A T  "
         done;
 ;;
+(* import grid path and solution path
+ * make matrix
+ * draw sudoku
+ * let play
+ * announce victory/defeat*)
+let new_match lvl height width=
+        let paths = get_sol_rep_paths lvl in
+        let file_stringR = file_to_string (fst paths) in
+        let file_stringS = file_to_string (snd paths) in
+        let grilleReponse = initGrille file_stringR in
+        let grilleSolution = initGrille file_stringS in
+        draw_sudoku_value grilleReponse height width;
+        let grilleReponse = read_key_and_draw  grilleSolution grilleReponse in
+        draw_victory grilleSolution grilleReponse
 
+;;
 
-(* import grid*)
-let file_stringR = file_to_string pathReponse;;
-(* import solution*)
-let file_stringS = file_to_string pathSolution;;
-
-(*make grille of grid*)
-let grilleReponse = initGrille file_stringR;;
-
-(*make grille of solution*)
-let grilleSolution = initGrille file_stringS;;
-
+(*import save path and solution path
+ * make matrix
+ * draw sudoku
+ * let play
+ * annonce victory/defeat*)
+let load_match lvl height width = 
+        let paths = get_save_path lvl in
+        let file_stringR = file_to_string (fst paths) in
+        let file_stringS = file_to_string (snd paths) in
+        let grilleReponse = initGrille file_stringR in
+        let grilleSolution = initGrille file_stringS in
+        draw_sudoku_value grilleReponse height width;
+        let grilleReponse = read_key_and_draw  grilleSolution grilleReponse in
+        draw_victory grilleSolution grilleReponse
+;;
 (*
 let grilleReponse = insertValueInMatrix 4 0 '8' grilleReponse;;
 let grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
@@ -439,9 +478,7 @@ let () =
         set_window_title " sudoku ";
         draw_sudoku width height;
         stroke 810 810;
-        draw_sudoku_value grilleReponse width height;
-        let grilleReponse = read_key_and_draw  grilleSolution grilleReponse in
-        draw_victory grilleSolution grilleReponse;
+        load_match 1 810 810;
         sound 10 10 ;
 ;;
 
