@@ -7,12 +7,18 @@ open Array
 
 (************* file paths ******************)
 
+(** il n y a plus besoin de spécifier les chemins c'est gérér par les fcts 
+ * -get_sol_rep_paths
+ * -get_save_path*)
+
+(** return (pathGrid,pathSol):couple*) 
 let get_sol_rep_paths lvl = 
         let dir = Sys.getcwd() in
         let stringLvl = string_of_int lvl in
         (dir^"/grids/grid"^stringLvl^".txt",dir^"/solutions/solution"^stringLvl^".txt" )
 ;;
 
+(** return (pathSave,pathSol):couple*) 
 let get_save_path lvl =
         let dir = Sys.getcwd() in
         let stringLvl = string_of_int lvl in
