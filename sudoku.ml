@@ -138,10 +138,53 @@ with e->
 let draw_sudoku  width height  =
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
-                 draw_rect (i*cellSize) (j*cellSize) (width*10)  (height*10); (*cuz cellSize/9=10*)
+                 draw_rect (i*cellSize) (j*cellSize) (width/10)  (height/10); (*cuz cellSize/9=10*)
                done;
         done;
 ;;
+
+(* help_and_commands*)
+let help_and_commands xLCorner yLCorner = 
+        let setXBack = Graphics.current_x() in
+        let setYBack = Graphics.current_x() in
+        let decr = yLCorner in 
+        Graphics.open_graph " 1200x810";
+        let decr = decr-200 in
+        Graphics.moveto xLCorner decr;
+        
+        Graphics.draw_string "Sudoku is played on a grid of 9 X 9 spaces";
+        let decr = decr-50 in
+        Graphics.moveto xLCorner decr;
+        let decr = decr-30 in
+        Graphics.draw_string "Within the rows and columns are 9 “squares”";
+        Graphics.moveto xLCorner decr;
+        Graphics.draw_string "(made up of 3 x 3 spaces Each row, column and";
+        let decr = decr-30 in
+        Graphics.moveto xLCorner decr;
+        Graphics.draw_string "square (9 spaces each) needs to be filled out ";
+        let decr = decr-30 in
+        Graphics.moveto xLCorner decr;
+        Graphics.draw_string "witht he numbers 1-9, without repeating any numbers";
+        let decr = decr-30 in
+        Graphics.moveto xLCorner decr;
+        Graphics.draw_string "within the row, column or square";
+        let decr = decr-70 in
+        Graphics.moveto xLCorner decr;
+        Graphics.draw_string "Commands :";
+        let decr = decr-50 in
+        Graphics.moveto xLCorner decr;
+        Graphics.draw_string " mouse click : select a cell";
+        let decr = decr-30 in
+        Graphics.moveto xLCorner decr;
+        Graphics.draw_string "h key : fill the selected cell with the right valuesi";
+        let decr = decr-30 in
+        Graphics.moveto xLCorner decr;
+        Graphics.draw_string "0 key : delete the number of the selected cell";
+        Graphics.moveto (xLCorner-100) 10;
+        Graphics.draw_string "show/hide : desc+commandes";
+        Graphics.moveto setXBack setYBack
+;; 
+
 
 (*procedure  draw_sudoku_value 
   given a matrix of couples (char,bool), draw its characters to screen 
@@ -305,6 +348,13 @@ let checkAllCellsWritten mat =
 ;; 
 
 
+let resize_graph widthStd tailleSupp = 
+        if Graphics.size_x()>widthStd then
+                Graphics.resize_window widthStd (Graphics.size_y())
+        else
+        Graphics.resize_window (widthStd+tailleSupp) (Graphics.size_y())
+;;
+
 (*function sudoku_position 
   given a position given a couple of (x,y) in bounds of our sudoku and
   a list of possible positions, it choose the right position and returns
@@ -350,6 +400,17 @@ let get_sudoku_matrice_position pos_couple positionList =
     in matchPos positionList {abs = -1; ord = -1}
 ;;
 
+let draw_help_rect posX posY = 
+      let setXBack = Graphics.current_x() in 
+      let setYBack = Graphics.current_y() in 
+      Graphics.fill_rect posX (810 -(810-posY)) 40 40;
+      Graphics.moveto (posX+10) (posY+15);
+      Graphics.set_color Graphics.white;
+      Graphics.draw_string "help";
+      Graphics.set_color Graphics.black;
+      Graphics.moveto setXBack setYBack;
+;;
+
 (*procedure read_key_and_draw
   listen for numerical keys and draw them in sudoku cell
   under the mouse
@@ -360,9 +421,13 @@ let read_key_and_draw grilleSolution grilleReponse=
     let toBeModifiedMousePos = {abs= -1 ; ord = -1} in
     let grilleComplete = ref true in 
   while  !grilleComplete do
+    draw_help_rect 770 0;
 let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down;Graphics.Mouse_motion] in
     if e.Graphics.button then begin
       Graphics.clear_graph ();
+      if(fst (Graphics.mouse_pos()))>770 && (snd (Graphics.mouse_pos()))<40 then
+              resize_graph width 400;
+      help_and_commands 840 height;
       draw_sudoku width height;
       draw_sudoku_value grilleReponse width height;
       Graphics.set_color Graphics.red;
@@ -382,6 +447,7 @@ let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down;Grap
              else
                grilleReponse) in
          Graphics.clear_graph ();
+         help_and_commands 820 810;
          draw_sudoku width height;
          draw_sudoku_value grilleReponse width height;
         if( (int_of_char key)>=(int_of_char '0') && (int_of_char key)<=(int_of_char '9')) then begin
@@ -390,8 +456,9 @@ let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down;Grap
              else
                 insert_value_into_sudoku grilleReponse key sudokuMatPos) in
             Graphics.clear_graph ();
+            help_and_commands 820 810;
             draw_sudoku width height;
-            draw_sudoku_value grilleReponse width height
+            draw_sudoku_value grilleReponse width height;
         end;
     
     
@@ -460,6 +527,11 @@ let load_match lvl height width =
         let grilleReponse = read_key_and_draw  grilleSolution grilleReponse in
         draw_victory grilleSolution grilleReponse
 ;;
+
+
+
+
+
 (*
 let grilleReponse = insertValueInMatrix 4 0 '8' grilleReponse;;
 let grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
@@ -480,16 +552,18 @@ verifGrille grilleSolution grilleSolution;;
 *)
 
 let () =
+        (*help_and_commands 30 30;*)
         open_graph " 810x810";
-        set_window_title " sudoku ";
+        set_window_title " SUDOKU 9X9  click on help to show/hide commands ";
         draw_sudoku width height;
         stroke 810 810;
-        load_match 1 810 810;
+        new_match 0 810 810;
         sound 10 10 ;
+        (*draw_image (Ig.init_image  ("/img1.png") ) 200 400;*)
+        loop();
 ;;
 
 (******************end of file*******************)
-
 
 
 
