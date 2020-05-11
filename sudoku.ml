@@ -328,8 +328,49 @@ let remove_value_from_sudoku coupleMat sudokuPos =
       coupleMat
 ;;
 
+(*contruct a free position *)
+let getListOfFreeSudoPos grilleReponse =
+  let listOfFreeMatPos = ref [] in 
+  for i = 0 to 8 do 
+    for j = 0 to 8 do
+      if(snd grilleReponse.(i).(j)) then
+        if((fst grilleReponse.(i).(j))='0') then
+          listOfFreeMatPos :=(i,j)::!listOfFreeMatPos ;
+    done
+  done; 
+  !listOfFreeMatPos 
+;;
+
+
+
+let getFreeSudoPos grilleReponse listOfFreeMatPos = 
+  let index = Random.int (List.length listOfFreeMatPos) in
+  let rec freePos l cpt indCible value = 
+      match l with 
+      |[] -> (-1,-1)
+      |head::tail -> if cpt = indCible then value 
+                      else freePos tail (cpt+1) indCible head 
+in freePos listOfFreeMatPos 0 index (List.hd listOfFreeMatPos)
+;;
+    
+
+let insertAVallueOnHelp grilleSolution grilleReponse = 
+(*choose one math posi and put a the correct number *)
+    let freeMatPos = getListOfFreeSudoPos grilleReponse in
+    let pos = getFreeSudoPos grilleReponse freeMatPos in
+    let i = fst pos in
+    let j = snd pos in 
+    let value = fst grilleSolution.(i).(j) in
+    if (i <> -1) then
+        if (j<> -1 ) then
+            insertValueInMatrix grilleReponse value i j
+        else grilleReponse
+     else
+        grilleReponse
+;;
+
 (*weirdly giving a bool instead of a char as value doesn't trigger error*)
-let insertAVallueOnhelp  grilleSolution grilleReponse  sudokuPos =
+let insertAVallueOnhelp  grilleSolution grilleReponse sudokuPos =
     let value = fst (grilleSolution.(sudokuPos.abs).(sudokuPos.ord)) in
     if (snd grilleReponse.(sudokuPos.abs).(sudokuPos.ord)) then
         insertValueInMatrix grilleReponse value sudokuPos.abs sudokuPos.ord 
@@ -443,7 +484,8 @@ let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down;Grap
         let mousePos = (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) in
         let sudokuMatPos = get_sudoku_matrice_position mousePos positionList in
         let grilleReponse = (if key='h' then
-                insertAVallueOnhelp grilleSolution grilleReponse sudokuMatPos 
+                insertAVallueOnHelp grilleSolution grilleReponse
+                (*insertAVallueOnhelp grilleSolution grilleReponse sudokuMatPos *)
              else
                grilleReponse) in
          Graphics.clear_graph ();
