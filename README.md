@@ -1,24 +1,21 @@
 # Sudoku
 
-projet : programm a graphical interactive game
+projectt : program a graphical interactive sudoku game in ocaml language
 
+ce projet a été fais dans le cadre du cours d'ocaml de L3INFO 2019-2020 de l'université 
+paris saclay. voici le lien de l'enoncé  : 
+https://www.lri.fr/~conchon/PFA/PROJET/index.html
 
-Lancer le jeu 
+#To play
 
-cloner le repo
-mettre dans les path du fichier sudoku les bon chemins
-compiler
-executer et jouer 
-1) git clone https://github.com/Azakira/Sudoku.git
+1) cloner le repository or download it 
+ `git clone https://github.com/Azakira/Sudoku.git`
+2)from where u called the above command line compile the files with 
+`make`
+3) start playing the game with the following 
+`./sudoku`
 
-dans la suite yourPath est le chemin que vous donne l'ordinateur
-lorsque vous tzper la commande pwd à parti du dossier ou vous etiez place lordque 
-vous avez envoyé  la comme du dessus
-2) cd yourPath/Sudoku       
-let pathReponse = "yourPath/Sudoku/grids/grid0.txt"
-let pathReponse = "yourPath/Sudoku/solutions/solution0.txt
-
-3) ocamlc -o sudoku graphics.cma sudoku.ml
-4) ./sudoku
+#to contribute
+pull requests are welcome ! 
 
 
