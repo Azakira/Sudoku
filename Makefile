@@ -100,7 +100,7 @@ CUSTOM=-custom
 
 # Default setting of the WITH* variables. Should be changed if your
 # local libraries are not found by the compiler.
-WITHGRAPHICS =graphics.cma -cclib -lgraphics -cclib -L/usr/X11R6/lib -cclib -lX11
+WITHGRAPHICS =graphics.cma images.cmo -cclib -lgraphics -cclib -L/usr/X11R6/lib -cclib -lX11
 
 WITHUNIX =unix.cma -cclib -lunix
 
