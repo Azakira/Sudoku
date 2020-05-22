@@ -185,22 +185,22 @@ let help_and_commands xLCorner yLCorner =
         Graphics.draw_string "show/hide : desc+commandes";
         Graphics.moveto setXBack setYBack
 ;; 
-let draw_num num modif i j =
+(*let draw_num num modif i j =
 	if (modif = true) then
 		dessiner_image (lire_image ("images/img"^num^".png")) i j
 	else 
 		dessiner_image (lire_image ("images/selectimg"^num^".png")) i j
-;;
+;;*)
 	
 
 
-(*procedure  draw_sudoku_value 
+procedure  draw_sudoku_value 
   given a matrix of couples (char,bool), draw its characters to screen 
   !!! ocaml graph uses mathematical represenation of graphs: i or x is from left to light 
       and j from bottom to top  !!!
   @param sudoku_values : matrix of couples (char,bool)
   @return none
-*)
+
 let draw_sudoku_value sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
