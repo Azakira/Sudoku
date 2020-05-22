@@ -194,12 +194,12 @@ let help_and_commands xLCorner yLCorner =
 	
 
 
-procedure  draw_sudoku_value 
+(*procedure  draw_sudoku_value 
   given a matrix of couples (char,bool), draw its characters to screen 
   !!! ocaml graph uses mathematical represenation of graphs: i or x is from left to light 
       and j from bottom to top  !!!
   @param sudoku_values : matrix of couples (char,bool)
-  @return none
+  @return none*)
 
 let draw_sudoku_value sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
