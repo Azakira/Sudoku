@@ -2,6 +2,7 @@ open Printf
 open Graphics
 open String
 open Array
+open Images
 
 
 
@@ -184,6 +185,13 @@ let help_and_commands xLCorner yLCorner =
         Graphics.draw_string "show/hide : desc+commandes";
         Graphics.moveto setXBack setYBack
 ;; 
+let draw_num num modif i j =
+	if (modif = true) then
+		dessiner_image (lire_image ("images/img"^num^".png")) i j
+	else 
+		dessiner_image (lire_image ("images/selectimg"^num^".png")) i j
+;;
+	
 
 
 (*procedure  draw_sudoku_value 
@@ -196,18 +204,11 @@ let help_and_commands xLCorner yLCorner =
 let draw_sudoku_value sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
-                 moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
-                 if ( (fst (sudoku_values.(j).(i))) != '0') then begin
-                   Graphics.draw_char (fst (sudoku_values.(j).(i)));
                  if ( (snd (sudoku_values.(j).(i))) = false) then 
-                   let grey = Graphics.rgb 125 125 125 in
-                   Graphics.set_color grey;
-                   Graphics.fill_rect (i*cellSize)  ((((width/cellSize)-1)-j)*cellSize) (cellSize) (cellSize);
-                   Graphics.set_color Graphics.black;
-                   Graphics.draw_rect (i*cellSize)  ((((width/cellSize)-1)-j)*cellSize) (cellSize) (cellSize);
-                   moveto (i*cellSize+(cellSize/2))  ((((width/cellSize)-1)-j)*cellSize+(cellSize/2)) ;
-                   Graphics.draw_char (fst (sudoku_values.(j).(i)));
-                 end 
+                 	draw_num (Char.escaped (fst (sudoku_values.(j).(i)))) (false) (i*cellSize+8) ((((width/cellSize)-1)-j)*cellSize+8)
+                 else if ( (fst (sudoku_values.(j).(i))) != '0') then
+                   		draw_num (Char.escaped (fst (sudoku_values.(j).(i)))) (true) (i*cellSize+8) ((((width/cellSize)-1)-j)*cellSize+8);
+
               
                done;
         done;
