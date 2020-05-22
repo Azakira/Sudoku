@@ -595,14 +595,13 @@ verifGrille grilleSolution grilleSolution;;
 *)
 
 let () =
-        (*help_and_commands 30 30;*)
+        help_and_commands 30 30;
         open_graph " 810x810";
         set_window_title " SUDOKU 9X9  click on help to show/hide commands ";
         draw_sudoku width height;
         stroke 810 810;
         new_match 0 810 810;
         sound 10 10 ;
-        (*draw_image (Ig.init_image  ("/img1.png") ) 200 400;*)
         loop();
 ;;
 
