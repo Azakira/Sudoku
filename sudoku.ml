@@ -48,7 +48,6 @@ let positionList = [0;90;180;270;360;450;540;630;720;810];;
 type sudoku_position = {mutable abs:int; mutable ord:int};;
 
 
-
 (********* end of global variables **************)
 
 
@@ -75,7 +74,7 @@ let initGrille str =
 ;;
  
 
-(*procedure affiche_grille  
+(*procedure affiche_grille print symbols representing a grid 
   @param a 9*9 matrix of couples (int as a char, bool)
   @return void
 *)
@@ -120,6 +119,7 @@ let file_to_string path =
 
 ;;
 
+(* do the opposite of file_to_string function*)
 let string_to_file path s = 
     let file = open_out path in
     try 
@@ -132,7 +132,7 @@ with e->
 (*procedure draw_sudoku
   given a height and a width, considering a nested loop where i are horizental lines ans j
   vertical lines, i and j varying from 0 to (height|width/cellSize)-1=8 as  we  choose height and width  to get 9*9 cells
-  and we draw lines every cellSize pixel  (i*cellSize)(j*cellSize)
+  and we draw lines every cellSizeth pixel(90)  (i*cellSize)(j*cellSize)
   @param a width, a height
   @return none
 *)
@@ -144,12 +144,32 @@ let draw_sudoku  width height  =
         done;
 ;;
 
+(* drawSudokuCell 
+draw a sudoku cell of cellSize (90 pixels) at x y on the screen
+@param x,y int
+@return void
+*)
+let draw_sudoku_cell size abs ord = 
+    draw_rect abs ord size size
+;;
+
+(*draw_all_sudokuCell
+draw all sudoku cell given a width and a height*)
+let draw_all_sudokuCell width height = 
+        for i=0 to (height/cellSize)-1 do
+               for j =0 to (width/cellSize)-1 do
+                    draw_sudoku_cell cellSize (i*cellSize) (j*cellSize)
+               done;
+        done;
+;;
+    
+
+
 (* help_and_commands*)
 let help_and_commands xLCorner yLCorner = 
         let setXBack = Graphics.current_x() in
         let setYBack = Graphics.current_x() in
         let decr = yLCorner in 
-        Graphics.open_graph " 1200x810";
         let decr = decr-200 in
         Graphics.moveto xLCorner decr;
         
@@ -181,27 +201,25 @@ let help_and_commands xLCorner yLCorner =
         let decr = decr-30 in
         Graphics.moveto xLCorner decr;
         Graphics.draw_string "0 key : delete the number of the selected cell";
-        Graphics.moveto (xLCorner-100) 10;
-        Graphics.draw_string "show/hide : desc+commandes";
         Graphics.moveto setXBack setYBack
 ;; 
-(*let draw_num num modif i j =
+let draw_num num modif i j =
 	if (modif = true) then
 		dessiner_image (lire_image ("images/img"^num^".png")) i j
 	else 
 		dessiner_image (lire_image ("images/selectimg"^num^".png")) i j
-;;*)
+;;
 	
 
 
-(*procedure  draw_sudoku_value 
+(*procedure  draw_all_sudoku_values 
   given a matrix of couples (char,bool), draw its characters to screen 
   !!! ocaml graph uses mathematical represenation of graphs: i or x is from left to light 
       and j from bottom to top  !!!
   @param sudoku_values : matrix of couples (char,bool)
-  @return none*)
-
-let draw_sudoku_value sudoku_values height width=
+  @return none
+*)
+let draw_all_sudoku_values sudoku_values height width=
         for i=0 to (height/cellSize)-1 do
                for j =0 to (width/cellSize)-1 do
                  if ( (snd (sudoku_values.(j).(i))) = false) then 
@@ -213,7 +231,17 @@ let draw_sudoku_value sudoku_values height width=
                done;
         done;
 ;;
+let draw_clean_sudoku_cell size abs ord = 
+    Graphics.moveto abs ord;
+    Graphics.set_color Graphics.white;
+    Graphics.fill_rect  abs ord size size;
+    Graphics.moveto abs ord
+;;
 
+(*procedure draw__sudoku_value*)
+let draw_sudoku_value num modif abs ord =
+    draw_num num modif abs ord
+;;
 
 
 (*function stroke 
@@ -225,8 +253,8 @@ let draw_sudoku_value sudoku_values height width=
 *)
 let stroke width height =
 
-	for i=0 to height/270 do
-	     for j=0 to width/270 do   		
+	for i=0 to (height/270)-1 do
+	     for j=0 to (width/270)-1 do   		
 				draw_rect (i*270) (j*270) (3*width/9) (3*height/9);
 				set_line_width 3;
 	     done;
@@ -355,7 +383,7 @@ in freePos listOfFreeMatPos 0 index (List.hd listOfFreeMatPos)
 ;;
     
 
-let insertAVallueOnHelp grilleSolution grilleReponse = 
+let insertAValueOnHelp grilleSolution grilleReponse = 
 (*choose one math posi and put a the correct number *)
     let freeMatPos = getListOfFreeSudoPos grilleReponse in
     let pos = getFreeSudoPos grilleReponse freeMatPos in
@@ -371,7 +399,7 @@ let insertAVallueOnHelp grilleSolution grilleReponse =
 ;;
 
 (*weirdly giving a bool instead of a char as value doesn't trigger error*)
-let insertAVallueOnhelp  grilleSolution grilleReponse sudokuPos =
+let insertAValueOnhelp  grilleSolution grilleReponse sudokuPos =
     let value = fst (grilleSolution.(sudokuPos.abs).(sudokuPos.ord)) in
     if (snd grilleReponse.(sudokuPos.abs).(sudokuPos.ord)) then
         insertValueInMatrix grilleReponse value sudokuPos.abs sudokuPos.ord 
@@ -419,6 +447,22 @@ let get_sudoku_graph_position pos_couple positionList =
     in matchPos positionList {abs = -1; ord = -1}
 ;;
 
+
+let set_marker_on_cell abs ord width height positionList= 
+        let sudokuGraphPos = get_sudoku_graph_position (abs,ord) positionList in
+        Graphics.set_color Graphics.red;
+        Graphics.fill_rect ((sudokuGraphPos.abs-(cellSize/2))+2)  ((sudokuGraphPos.ord-(cellSize/2))+2) width height;
+        Graphics.set_color Graphics.black
+;;
+
+
+let unset_marker_on_cell  abs ord width height positionList= 
+        let sudokuGraphPos = get_sudoku_graph_position (abs,ord) positionList in
+        Graphics.set_color Graphics.white;
+        Graphics.fill_rect ((sudokuGraphPos.abs-(cellSize/2))+2)  ((sudokuGraphPos.ord-(cellSize/2))+2) width height;
+        Graphics.set_color Graphics.black
+;;
+
 (*function sudoku_position 
   given a position given a couple of (x,y) in bounds of our sudoku and
   a list of possible positions, it choose the right position and returns
@@ -459,57 +503,54 @@ let draw_help_rect posX posY =
   @param grilleReponse 
   @return none
 *)
-let read_key_and_draw grilleSolution grilleReponse= 
-    let toBeModifiedMousePos = {abs= -1 ; ord = -1} in
+let read_key_and_draw  grilleSolution grilleReponse= 
+    (*variable used to select a certain cell by spreading its value on the whole block*)
+    let toBeModifiedMousePos = {abs= 0 ; ord = 0} in
+    let cellMarker = {abs= 0 ; ord = 0} in
     let grilleComplete = ref true in 
-  while  !grilleComplete do
-    draw_help_rect 770 0;
-let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down;Graphics.Mouse_motion] in
+help_and_commands 840 height;
+    while  !grilleComplete do
+    let e = Graphics.wait_next_event [Graphics.Key_pressed;Graphics.Button_down;Graphics.Mouse_motion] in
     if e.Graphics.button then begin
-      Graphics.clear_graph ();
-      if(fst (Graphics.mouse_pos()))>770 && (snd (Graphics.mouse_pos()))<40 then
-              resize_graph width 400;
-      help_and_commands 840 height;
-      draw_sudoku width height;
-      draw_sudoku_value grilleReponse width height;
-      Graphics.set_color Graphics.red;
-      toBeModifiedMousePos.abs <- e.mouse_x;
-      toBeModifiedMousePos.ord <- e.mouse_y;
-      let mousePos = (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) in
-      let sudokuGraphPos = get_sudoku_graph_position mousePos positionList in
-      Graphics.fill_rect (sudokuGraphPos.abs-(cellSize/2))  (sudokuGraphPos.ord-(cellSize/2)) (cellSize) (10);
-      Graphics.set_color Graphics.black
+                if (e.mouse_x>0) && (e.mouse_x<810) && (e.mouse_y>0) && (e.mouse_y<810) then (
+                (*select the cell *)
+                toBeModifiedMousePos.abs <- e.mouse_x;
+                toBeModifiedMousePos.ord <- e.mouse_y;
+                (* mark the selected cell*)          
+                unset_marker_on_cell cellMarker.abs cellMarker.ord 86 5 positionList;
+                cellMarker.abs <- toBeModifiedMousePos.abs;
+                cellMarker.ord <- toBeModifiedMousePos.ord;
+                set_marker_on_cell toBeModifiedMousePos.abs toBeModifiedMousePos.ord 86 5 positionList;)
     end;
     if e.Graphics.keypressed then
-        let key = e.Graphics.key in
-        let mousePos = (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) in
-        let sudokuMatPos = get_sudoku_matrice_position mousePos positionList in
-        let grilleReponse = (if key='h' then
-                insertAVallueOnHelp grilleSolution grilleReponse
-                (*insertAVallueOnhelp grilleSolution grilleReponse sudokuMatPos *)
-             else
-               grilleReponse) in
-         Graphics.clear_graph ();
-         help_and_commands 820 810;
-         draw_sudoku width height;
-         draw_sudoku_value grilleReponse width height;
-        if( (int_of_char key)>=(int_of_char '0') && (int_of_char key)<=(int_of_char '9')) then begin
-             let grilleReponse = (if (int_of_char key)=(int_of_char '0') then
-                remove_value_from_sudoku   grilleReponse sudokuMatPos
-             else
-                insert_value_into_sudoku grilleReponse key sudokuMatPos) in
-            Graphics.clear_graph ();
-            help_and_commands 820 810;
-            draw_sudoku width height;
-            draw_sudoku_value grilleReponse width height;
-        end;
+        let sudokuMatPos = get_sudoku_matrice_position (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) positionList in
+        let grilleReponse = (if e.key='h' then
+        insertAValueOnhelp grilleSolution grilleReponse sudokuMatPos else grilleReponse) in 
+        let sudokuGraphPos = get_sudoku_graph_position (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) positionList in
+        let sudokuMatPos = get_sudoku_matrice_position (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) positionList in
+        let num = fst (grilleReponse.(sudokuMatPos.abs).(sudokuMatPos.ord)) in
+        print_char num;
+        draw_sudoku_value (Char.escaped num) true ((sudokuGraphPos.abs-(cellSize/2))+10) ((sudokuGraphPos.ord-(cellSize/2))+10);
+
+        let grilleReponse = if( (int_of_char e.key)>=(int_of_char '0') && (int_of_char e.key)<=(int_of_char '9')) then
+            let innerGrilleReponse = if snd (grilleReponse.(sudokuMatPos.abs).(sudokuMatPos.ord))=true then 
+                        let inner2GrilleReponse = insert_value_into_sudoku grilleReponse (e.key) sudokuMatPos in
+                        let sudokuGraphPos = get_sudoku_graph_position (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) positionList in
+                        let sudokuMatPos = get_sudoku_matrice_position (toBeModifiedMousePos.abs,toBeModifiedMousePos.ord) positionList in
+                        let num = fst (inner2GrilleReponse.(sudokuMatPos.abs).(sudokuMatPos.ord)) in
+                        draw_sudoku_value (Char.escaped num) true ((sudokuGraphPos.abs-(cellSize/2))+10) ((sudokuGraphPos.ord-(cellSize/2))+10); 
+                        inner2GrilleReponse else grilleReponse in
+            innerGrilleReponse
+                
+        else grilleReponse in
     
     
     grilleComplete :=  not (checkAllCellsWritten grilleReponse);
-    
   done;
     grilleReponse;
 ;;
+
+
 
 (*function loop
   calls its self
@@ -549,7 +590,7 @@ let new_match lvl height width=
         let file_stringS = file_to_string (snd paths) in
         let grilleReponse = initGrille file_stringR in
         let grilleSolution = initGrille file_stringS in
-        draw_sudoku_value grilleReponse height width;
+        draw_all_sudoku_values grilleReponse height width;
         let grilleReponse = read_key_and_draw  grilleSolution grilleReponse in
         draw_victory grilleSolution grilleReponse
 
@@ -566,27 +607,14 @@ let load_match lvl height width =
         let file_stringS = file_to_string (snd paths) in
         let grilleReponse = initGrille file_stringR in
         let grilleSolution = initGrille file_stringS in
-        draw_sudoku_value grilleReponse height width;
+        draw_all_sudoku_values grilleReponse height width;
         let grilleReponse = read_key_and_draw  grilleSolution grilleReponse in
         draw_victory grilleSolution grilleReponse
 ;;
 
 
-
-
-
-(*
-let grilleReponse = insertValueInMatrix 4 0 '8' grilleReponse;;
-let grilleReponse = insertValueInMatrix 0 1 '3' grilleReponse;;
-let grilleReponse = insertValueInMatrix 0 3 '5' grilleReponse;;
-*)
-(*
-affiche_grille grilleReponse;;
-
-verifGrille grilleSolution grilleSolution;;
-
-*)
-
+let invalid incr x y n m =
+    incr<9 && ((fst m.(x).(incr))<>n&& (fst m.(incr).(y)) <> n && (fst m.(x/3*3 + incr mod 3).(y/3*3 + 1 mod 3)))
     
 (*unit
   functions call at  the execution of this file
@@ -595,10 +623,9 @@ verifGrille grilleSolution grilleSolution;;
 *)
 
 let () =
-        help_and_commands 30 30;
-        open_graph " 810x810";
+        open_graph " 1200x810";
         set_window_title " SUDOKU 9X9  click on help to show/hide commands ";
-        draw_sudoku width height;
+        draw_all_sudokuCell width height;
         stroke 810 810;
         new_match 0 810 810;
         sound 10 10 ;
@@ -609,42 +636,8 @@ let () =
 
 
 
-
-
-
-
-
-
-
-
-
-
 (*
 
-let verifieLigne i matRep =
-        (*given an array  of 9 zeros *)
-        let hashArray = Array.make 9 0 in 
-        (* consider every value in mapRep.(i) as our array's index and do +1 at that index 
-         * the number at that index of our array correspond to the occurence of that index as a value
-         * in the mapRep.(i) *)
-        for j = 0 to 8 do
-                let pos = (int_of_char (matRep.(i).(j)) -1)  in
-                hashArray.( pos )  <-  hashArray.(pos) + 1
-                (*error in this for-loop*)
-        done;
-        print_ "ok";
-        (*transform array to list *)
-        let arrayToList = to_list hashArray in
-        (* check if every number occurs only once *)
-        let rec verifyList l = 
-                match l with
-                []-> true
-                |h::t -> if h=0 then verifyList t else h=0 
-        in
-        verifyList arrayToList
-
-
-;;
 
 *)
 
